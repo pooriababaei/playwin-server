@@ -30,7 +30,7 @@ var app = express();
 //   });
 //
 //   //  apply to all requests
-    app.use('^\\/((api\/user|api\/admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',limiter);  // returns 429 if reach maximum reqs.
+  //  app.use('^\\/((api\/user|api\/admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',limiter);  // returns 429 if reach maximum reqs.
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
