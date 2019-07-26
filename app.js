@@ -30,7 +30,7 @@ var app = express();
 //   });
 //
 //   //  apply to all requests
-//    app.use('^\\/((user|admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',limiter);  // returns 429 if reach maximum reqs.
+    app.use('^\\/((api\/user|api\/admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',limiter);  // returns 429 if reach maximum reqs.
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -55,7 +55,7 @@ app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/ftp', express.static('public'), serve('public', {'icons': true}));
 
-app.use('/admin', routes.admin);
-app.use('/user', routes.user);
+app.use('/api/admin', routes.admin);
+app.use('/api/user', routes.user);
 
 module.exports = app;
