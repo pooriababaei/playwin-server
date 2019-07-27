@@ -48,8 +48,8 @@ var accessLogStream = rfs('access.log', {
   // setup the logger
 app.use(morgan('combined', { stream: accessLogStream }));
 
-app.use(bodyParser.json({limit: '10mb'}));
-app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true,parameterLimit: 1000000}));
 app.use(cookieParser());
 //app.use('^\\/((user|admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',isUserOrAdmin);
 app.use('/public', express.static(path.join(__dirname, 'public')));
