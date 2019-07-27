@@ -31,7 +31,7 @@ router.put('/user/:id', (req, res) => {  //isAdmin
         res.status(200).send(user);
     });
 });
-router.delete('/user', (req, res) => {
+router.delete('/user/:id', (req, res) => {
     User.findOneAndRemove({_id: req.params.userId}, (err, user) => {
         if (err)
             return res.status(500).send(err);
@@ -71,9 +71,9 @@ router.get('/user', (req, res) => {
         }).status(200).json(replaceIdWith_IdInArray(users));
     });
 });
-router.get('/user/:_id', (req, res) => {
+router.get('/user/:id', (req, res) => {
 
-    User.findById(req.params._id, (err, user) => {
+    User.findById(req.params.id, (err, user) => {
         if (err)
             return res.sendStatus(500);
         if (!user)
