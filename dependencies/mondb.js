@@ -18,6 +18,7 @@ require('./models/game');
 require('./models/league');
 require('./models/boxTransaction');
 require('./models/toPay');
+require('./models/admin');
 require('./models/box');
 require('./models/avatar');
 

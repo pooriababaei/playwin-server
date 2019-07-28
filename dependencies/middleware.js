@@ -10,8 +10,14 @@ const debug = require('debug')('Middleware:');
 
 
 const isUser = function (req, res, next) {
-    const token = req.headers.token;
-    if (token) {
+    const authArray = req.headers.Authorization.toString().split(" ");
+    if (authArray.length != 2)
+        return res.sendStatus(401);
+    const bearer = req.headers.Authorization.toString().split(" ")[0];
+    const token = req.headers.Authorization.toString().split(" ")[1];
+
+
+    if (bearer == "Bearer" && token) {
         jwt.verify(token, user_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
@@ -23,23 +29,29 @@ const isUser = function (req, res, next) {
                 next();
             }
             else
-                return res.status(401).send();
+                return res.sendStatus(401);
         });
     }
     else {
-        return res.status(401).send();
+        return res.sendStatus(401);
     }
 };
 
 const isAdmin = function (req, res, next) {
-    const token = req.headers.token;
-    if (token) {
+    const authArray = req.headers.Authorization.toString().split(" ");
+    if (authArray.length != 2)
+        return res.sendStatus(401);
+    const bearer = authArray[0];
+    const token = authArray[1];
+
+    if (bearer == "Bearer" && token) {
         jwt.verify(token, admin_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
             if (decoded && decoded.role === 'admin') {
                 req.adminId = decoded._id;
                 req.email = decoded.email;
+                req.username = username;
                 next();
             }
             else
@@ -52,8 +64,13 @@ const isAdmin = function (req, res, next) {
 };
 
 const isUserOrAdmin = function (req, res, next) {
-    const token = req.headers.token;
-    if (token) {
+    const authArray = req.headers.Authorization.toString().split(" ");
+    if (authArray.length != 2)
+        return res.sendStatus(401);
+    const bearer = authArray[0];
+    const token = authArray[1];
+
+    if (bearer == "Bearer" && token) {
         jwt.verify(token, user_key, function (err, decoded) {
             if (decoded && decoded.role === 'user') {
                 req.userId = decoded._id;
@@ -77,8 +94,12 @@ const isUserOrAdmin = function (req, res, next) {
 };
 
 const isApp = function (req, res, next) {
-    const token = req.headers.token;
-    if (token) {
+    const authArray = req.headers.Authorization.toString().split(" ");
+    if (authArray.length != 2)
+        return res.sendStatus(401);
+    const bearer = authArray[0];
+    const token = authArray[1];
+    if (bearer == "Bearer" && token) {
         jwt.verify(token, app_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();

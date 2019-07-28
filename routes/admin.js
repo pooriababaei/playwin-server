@@ -6,20 +6,184 @@ const path = require('path');
 const {gameUpload, leagueUpload, boxUpload} = require('../dependencies/fileUpload');
 const {replaceIdWith_IdInArray, replaceIdWith_Id} = require('../dependencies/functions');
 const {giveAwards} = require('../dependencies/dbFunctions');
-
+const debug = require('debug')('Admin:');
 const mongoose = require('mongoose');
 const _ = require('underscore');
 const urljoin = require('url-join');
-var AdmZip = require('adm-zip');
-
-
+const AdmZip = require('adm-zip');
+const crypto = require('crypto-js');
 const Game = mongoose.model('game');
 const League = mongoose.model('league');
 const User = mongoose.model('user');
 const Box = mongoose.model('box');
+const Admin = mongoose.model('admin');
 const scoreboardSchema = require('../dependencies/models/scoreboard');
+const async = require("async");
+const nodemailer = require("nodemailer");
 const isAdmin = require('../dependencies/middleware').isAdmin;
-const debug = require('debug')('Admin:');
+
+router.post('/', function (req, res) {
+    const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email');
+    console.log(info);
+    const admin = new Admin(info);
+    admin.save((err, admin) => {
+        if (err)
+            return res.status(400).send(err);
+        res.status(200).send(admin);
+    })
+});  // this should be for superUser
+
+router.get('/login', function (req, res) {
+    if (req.query.hasOwnProperty('password')) {
+        const pass = req.query.password;
+        if (req.query.hasOwnProperty('username')) {
+            const username = req.query.username;
+            Admin.findByUsername(username, pass).then(admin => {
+                const token = admin.generateToken();
+                console.log(token);
+                return res.status(200).send(token);
+            }).catch(() => {
+                return res.status(401).send();
+            });
+        }
+        else if (req.query.hasOwnProperty('email')) {
+            const email = req.query.email;
+            Admin.findByEmail(email, pass).then(admin => {
+                const token = admin.generateToken();
+                return res.status(200).send(token);
+            }).catch(() => {
+                return res.status(401).send();
+            });
+        }
+        else return res.status(400).send();
+    }
+    else
+        return res.status(400).send();
+});
+router.get('/forgot/:email', function (req, res) {
+    async.waterfall([
+        function (done) {
+            const wordArray = crypto.lib.WordArray.random(32);
+            const token = wordArray.toString();
+            console.log(token);
+            done(null, token);
+
+        },
+        function (token, done) {
+            Admin.findOne({email: req.params.email}, function (err, admin) {
+                if (!admin) {
+                    return res.status(400).send('No account with that email address exists.');
+                }
+
+                admin.resetPasswordToken = token;
+                admin.resetPasswordExpires = Date.now() + 3600000 / 2; // 1/2 hour
+
+                admin.save(function (err) {
+                    done(err, token, admin);
+                });
+            });
+        },
+        function (token, admin, done) {
+            var smtpTransport = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'pooriya.babaei.1997@gmail.com',
+                    pass: 'pooriya861376'
+                }
+            });
+            var mailOptions = {
+                to: admin.email,
+                from: 'passwordreset@demo.com',
+                subject: 'Node.js Password Reset',
+                text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+                    'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+                    'http://' + req.headers.host + 'api/admin/resetPassword/' + token + '\n\n' +
+                    'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+            };
+            smtpTransport.sendMail(mailOptions, function (err) {
+                if (!err)
+                    res.send('An e-mail has been sent to ' + admin.email + ' with further instructions.');
+                done(err, 'done');
+            });
+        }
+    ], function (err) {
+        if (err)
+            return res.status(500).send(err);
+    });
+});
+router.get('/resetPassword/:token', function (req, res) {
+    if (req.params.token) {
+        Admin.findOne({
+            resetPasswordToken: req.params.token,
+            resetPasswordExpires: {$gt: Date.now()}
+        }, function (err, admin) {
+            if (!admin) {
+                return res.status(404).send('Password reset token is invalid or has expired.')
+            }
+            let response = {token: req.params.token};
+            response.email = admin.email;
+            res.status(200).send(response);
+
+        });
+    }
+
+});
+router.post('/resetPassword/:token', function (req, res) {
+    console.log(req.body);
+    async.waterfall([
+        function (done) {
+            Admin.findOne({
+                resetPasswordToken: req.params.token,
+                resetPasswordExpires: {$gt: Date.now()}
+            }, function (err, admin) {
+                if (!admin) {
+                    return res.status(400).send('Password reset token is invalid or has expired.')
+                }
+                console.log(admin);
+                admin.password = req.body.password;
+                admin.resetPasswordToken = undefined;
+                admin.resetPasswordExpires = undefined;
+
+                admin.save(function (err) {
+                    done(err, admin);
+
+                });
+            });
+        },
+        function (admin, done) {
+            var smtpTransport = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'pooriya.babaei.1997@gmail.com',
+                    pass: 'pooriya861376'
+                }
+            });
+            var mailOptions = {
+                to: admin.email,
+                from: 'passwordreset@demo.com',
+                subject: 'Your password has been changed',
+                text: 'Hello,\n\n' +
+                    'This is a confirmation that the password for your account ' + admin.email + ' has just been changed.\n'
+            };
+            smtpTransport.sendMail(mailOptions, function (err) {
+                if (!err)
+                    res.status(200).send('Success! Your password has been changed.');
+                done(err);
+            });
+        }
+    ], function (err) {
+        res.status(500).send(err);
+    });
+});
+router.put('/', function (req, res) {
+    const info = _.pick(req.body, 'name', 'username', 'phone');
+    console.log(info);
+    Admin.update({_id: req.adminId}, info, (err, admin) => {
+        if (err)
+            return res.status(400).send(err);
+        res.status(200).send(admin);
+    })
+});
 
 
 router.put('/user/:id', (req, res) => {  //isAdmin
@@ -39,8 +203,6 @@ router.delete('/user/:id', (req, res) => {
     })
 });
 router.get('/user', (req, res) => {
-    let userState = {};
-
     let sort = null;
     let filter = null;
 
@@ -52,8 +214,8 @@ router.get('/user', (req, res) => {
 
     debug(req.query);
     let query = User.find();
-    if (filter.username) query.find({username: { $regex: '.*' + filter.username + '.*' } });
-    if (filter.phoneNumber) query.find({phoneNumber: { $regex: '.*' + filter.phoneNumber + '.*' }});
+    if (filter && filter.username) query.find({username: { $regex: '.*' + filter.username + '.*' } });
+    if (filter && filter.phoneNumber) query.find({phoneNumber: { $regex: '.*' + filter.phoneNumber + '.*' }});
 
     if (sort)
         query.sort([sort]);
