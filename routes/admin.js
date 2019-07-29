@@ -37,12 +37,12 @@ router.post('/login', function (req, res) {
     if (req.body.hasOwnProperty('password')) {
         const pass = req.body.password;
         if (req.body.hasOwnProperty('username')) {
-            const username = req.query.username;
-            Admin.findByUsername(username, pass).then(admin => {
+            const usernameOrEmail = req.body.username;
+            Admin.findByUsername(usernameOrEmail, pass).then(admin => {
                 const token = admin.generateToken();
                 return res.status(200).send(token);
             }).catch(() => {
-                Admin.findByEmail(email, pass).then(admin => {
+                Admin.findByEmail(usernameOrEmail, pass).then(admin => {
                     const token = admin.generateToken();
                     return res.status(200).send(token);
                 }).catch(() => {
@@ -50,9 +50,6 @@ router.post('/login', function (req, res) {
                 });
             });
         }
-
-
-
         else return res.status(400).send();
     }
     else
