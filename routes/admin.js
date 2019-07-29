@@ -33,28 +33,26 @@ router.post('/', function (req, res) {
     })
 });  // this should be for superUser
 
-router.get('/login', function (req, res) {
-    if (req.query.hasOwnProperty('password')) {
-        const pass = req.query.password;
-        if (req.query.hasOwnProperty('username')) {
+router.post('/login', function (req, res) {
+    if (req.body.hasOwnProperty('password')) {
+        const pass = req.body.password;
+        if (req.body.hasOwnProperty('username')) {
             const username = req.query.username;
             Admin.findByUsername(username, pass).then(admin => {
                 const token = admin.generateToken();
-                console.log(token);
                 return res.status(200).send(token);
             }).catch(() => {
-                return res.status(401).send();
+                Admin.findByEmail(email, pass).then(admin => {
+                    const token = admin.generateToken();
+                    return res.status(200).send(token);
+                }).catch(() => {
+                    return res.status(401).send();
+                });
             });
         }
-        else if (req.query.hasOwnProperty('email')) {
-            const email = req.query.email;
-            Admin.findByEmail(email, pass).then(admin => {
-                const token = admin.generateToken();
-                return res.status(200).send(token);
-            }).catch(() => {
-                return res.status(401).send();
-            });
-        }
+
+
+
         else return res.status(400).send();
     }
     else
