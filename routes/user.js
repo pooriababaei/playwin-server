@@ -12,6 +12,7 @@ const Auth = mongoose.model('auth');
 const resize= require('../dependencies/resize');
 let router = express.Router();
 const {isUser, isLeagueUp} = require('../dependencies/middleware');
+const {sendSMS} = require('../dependencies/functions');
 const {surroundingUsers, pagingUsers, userRank, surroundingUserRanks,edgeUsersRank, exchangeTotalOppoToLeagueOppo, exchangeCoinToMoney} = require('../dependencies/dbFunctions');
 const debug = require('debug')('User Route:');
 
@@ -34,7 +35,7 @@ router.get('/getAuthCode/:phone', (req, res) => {  //check inside later
                 return res.status(400).send();
 
             if (auth) {
-                //here we should send authToken to auth phone number
+                sendSMS(info.phoneNumber,auth.authToken);//here we should send authToken to auth phone number
                 return res.status(200).json(auth); //this is for test . we shouldnt send auth info here
             }
         });

@@ -10,11 +10,13 @@ const debug = require('debug')('Middleware:');
 
 
 const isUser = function (req, res, next) {
-    const authArray = req.headers.Authorization.toString().split(" ");
+    if(req.headers.authoriztion == null)
+        return res.sendStatus(401);
+    const authArray = req.headers.authorization.toString().split(" ");
     if (authArray.length != 2)
         return res.sendStatus(401);
-    const bearer = req.headers.Authorization.toString().split(" ")[0];
-    const token = req.headers.Authorization.toString().split(" ")[1];
+    const bearer = authArray[0];
+    const token = authArray[1];
 
 
     if (bearer == "Bearer" && token) {
@@ -38,7 +40,9 @@ const isUser = function (req, res, next) {
 };
 
 const isAdmin = function (req, res, next) {
-    const authArray = req.headers.Authorization.toString().split(" ");
+    if(req.headers.authoriztion == null)
+        return res.sendStatus(401);
+    const authArray = req.headers.authorization.toString().split(" ");
     if (authArray.length != 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
@@ -64,7 +68,9 @@ const isAdmin = function (req, res, next) {
 };
 
 const isUserOrAdmin = function (req, res, next) {
-    const authArray = req.headers.Authorization.toString().split(" ");
+    if(req.headers.authoriztion == null)
+        return res.sendStatus(401);
+    const authArray = req.headers.authorization.toString().split(" ");
     if (authArray.length != 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
@@ -94,7 +100,9 @@ const isUserOrAdmin = function (req, res, next) {
 };
 
 const isApp = function (req, res, next) {
-    const authArray = req.headers.Authorization.toString().split(" ");
+    if(req.headers.authoriztion == null)
+        return res.sendStatus(401);
+    const authArray = req.headers.authorization.toString().split(" ");
     if (authArray.length != 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
