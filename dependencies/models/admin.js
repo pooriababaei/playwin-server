@@ -15,11 +15,13 @@ const adminSchema = new Schema({
 
     email: {type: String, required: true, unique: true, trim: true, set: toLower},
 
-    phoneNumber: {type: Number, required: true},
+    phone: {type: String, required: true},
 
     resetPasswordToken: {type: String},
 
-    resetPasswordExpires: {type: Date}
+    resetPasswordExpires: {type: Date},
+
+    role: {type:String, enum : ['admin','superadmin'], default: 'admin'}
 
 
 }, {
@@ -40,7 +42,7 @@ adminSchema.methods.generateToken = function () {
         username: admin.username,
         phoneNumber: admin.phoneNumber,
         email: admin.email,
-        role: 'admin'
+        role: admin.role
     }, admin_key).toString();
     return token;
 

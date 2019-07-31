@@ -52,7 +52,35 @@ const isAdmin = function (req, res, next) {
         jwt.verify(token, admin_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
-            if (decoded && decoded.role === 'admin') {
+            if (decoded && decoded.role === 'admin' || decoded.role === 'superadmin') {
+                req.adminId = decoded._id;
+                req.email = decoded.email;
+                req.username = username;
+                next();
+            }
+            else
+                return res.status(401).send();
+        });
+    }
+    else {
+        return res.status(401).send();
+    }
+};
+
+const isSuperAdmin = function (req, res, next) {
+    if(req.headers.authorization == null)
+        return res.sendStatus(401);
+    const authArray = req.headers.authorization.toString().split(" ");
+    if (authArray.length != 2)
+        return res.sendStatus(401);
+    const bearer = authArray[0];
+    const token = authArray[1];
+
+    if (bearer == "Bearer" && token) {
+        jwt.verify(token, admin_key, function (err, decoded) {
+            if (err)
+                return res.send(401).send();
+            if (decoded && decoded.role === 'superadmin') {
                 req.adminId = decoded._id;
                 req.email = decoded.email;
                 req.username = username;
@@ -189,6 +217,7 @@ const isLeagueUp = function (req, res, next) {
 module.exports = {
     isUser,
     isAdmin,
+    isSuperAdmin,
     isUserOrAdmin,
     isApp,
     isLeagueUp

@@ -20,33 +20,34 @@ const Admin = mongoose.model('admin');
 const scoreboardSchema = require('../dependencies/models/scoreboard');
 const async = require("async");
 const nodemailer = require("nodemailer");
-const isAdmin = require('../dependencies/middleware').isAdmin;
+const {isAdmin,isSuperAdmin}= require('../dependencies/middleware');
 
-router.post('/', function (req, res) {
-    const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email');
-    console.log(info);
-    const admin = new Admin(info);
-    admin.save((err, admin) => {
+
+router.put('/',isAdmin, function (req, res) {
+    const info = _.pick(req.body, 'phone');
+    Admin.update({_id: req.adminId}, info, (err, admin) => {
         if (err)
             return res.status(400).send(err);
         res.status(200).send(admin);
     })
-});  // this should be for superUser
-
+});
 router.post('/login', function (req, res) {
+    console.log(req.body)
     if (req.body.hasOwnProperty('password')) {
         const pass = req.body.password;
         if (req.body.hasOwnProperty('username')) {
             const usernameOrEmail = req.body.username;
             Admin.findByUsername(usernameOrEmail, pass).then(admin => {
                 const token = admin.generateToken();
-                return res.status(200).send(token);
+                console.log(admin);
+                return res.status(200).send({token:token});
             }).catch(() => {
+                console.log('sdfsdfs');
                 Admin.findByEmail(usernameOrEmail, pass).then(admin => {
                     const token = admin.generateToken();
-                    return res.status(200).send(token);
+                    return res.status(200).JSON({token:token});
                 }).catch(() => {
-                    return res.status(401).send();
+                    return res.sendStatus(401);
                 });
             });
         }
@@ -170,15 +171,7 @@ router.post('/resetPassword/:token', function (req, res) {
         res.status(500).send(err);
     });
 });
-router.put('/', function (req, res) {
-    const info = _.pick(req.body, 'name', 'username', 'phone');
-    console.log(info);
-    Admin.update({_id: req.adminId}, info, (err, admin) => {
-        if (err)
-            return res.status(400).send(err);
-        res.status(200).send(admin);
-    })
-});
+
 
 
 router.put('/user/:id', (req, res) => {  //isAdmin
@@ -559,7 +552,7 @@ router.get('/league/:id', (req, res) => {
 router.post('/box', boxUpload, (req, res) => {
     const info = _.pick(req.body, 'name', 'price', 'offPrice');
     if (req.file)
-        info.image = 'public/boxes/' + req.file.filename;
+        info.image = '/public/boxes/' + req.files.image[0].filename;
     const box = new Box(info);
     box.save((err, box) => {
         if (err) return res.sendStatus(500);

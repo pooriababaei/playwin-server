@@ -15,7 +15,8 @@ const{isUserOrAdmin} = require('./dependencies/middleware');
 
 const routes = {
     admin: require('./routes/admin'),
-    user: require('./routes/user')
+    user: require('./routes/user'),
+    superadmin:require('./routes/superadmin')
 
 };
 var app = express();
@@ -55,7 +56,9 @@ app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/ftp', express.static('public'), serve('public', {'icons': true}));
 
-app.use('/api/admin', routes.admin);
 app.use('/api/user', routes.user);
+app.use('/api/admin/admin',routes.superadmin);
+app.use('/api/admin', routes.admin);
+
 
 module.exports = app;

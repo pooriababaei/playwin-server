@@ -9,6 +9,12 @@ const boxSchema = new Schema({
 
     offPrice: {type: Number},
 
+    oppos:{type:Number},
+
+    loyalties:{type:Number},
+
+    end_date:{type:Date},
+
     image: {type:String}
 });
 
