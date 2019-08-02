@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
 const admin_key = fs.readFileSync(path.join(__dirname, '../../keys/admin_key')).toString();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -16,6 +16,8 @@ const adminSchema = new Schema({
     email: {type: String, required: true, unique: true, trim: true, set: toLower},
 
     phone: {type: String, required: true},
+
+    image:{type:String},
 
     resetPasswordToken: {type: String},
 

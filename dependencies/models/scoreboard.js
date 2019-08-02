@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 function scoreboard(opp, spec) {
     const scoreboardSchema = new Schema({
 
-            user: {type: Schema.Types.ObjectId, ref: 'user'},
+            user: {type: Schema.Types.ObjectId, ref: 'user' , index:true},
 
             username: {type: String},
 

@@ -47,8 +47,8 @@ const leagueSchema = new Schema({
     secondaryColor : {type: String}
 });
 
-/*leagueSchema.virtual('id').get(function () {
+leagueSchema.virtual('id').get(function () {
     return this._id;
-});*/
+});
 
 module.exports = mongoose.model('league', leagueSchema);

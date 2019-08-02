@@ -41,7 +41,8 @@
     "sharp": "^0.22.1",
     "underscore": "^1.9.1",
     "url-join": "^4.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "zarinpal-checkout": "^0.2.7"
   },
   "devDependencies": {
     "eslint": "^6.0.1"

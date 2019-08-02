@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Admin = mongoose.model('admin');
+const {adminUpload} = require('../dependencies/fileUpload');
 const async = require("async");
 const nodemailer = require("nodemailer");
 const {isSuperAdmin}= require('../dependencies/middleware');
@@ -10,7 +11,7 @@ const _ = require('underscore');
 
 
 
-router.post('/', function (req, res) {
+router.post('/',adminUpload, function (req, res) {
     console.log(req.body);
     const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email','role');
     const admin = new Admin(info);
@@ -20,7 +21,7 @@ router.post('/', function (req, res) {
         res.status(200).send(admin);
     })
 });  // this should be for superUser
-router.put('/:adminId', function (req, res) {
+router.put('/:adminId',adminUpload, function (req, res) {
     if(!req.params.adminId) return res.sendStatus(400);
 
     const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email','role');

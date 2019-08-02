@@ -22,7 +22,7 @@ const isUser = function (req, res, next) {
     if (bearer == "Bearer" && token) {
         jwt.verify(token, user_key, function (err, decoded) {
             if (err)
-                return res.send(401).send();
+                return res.sendStatus(401);
             if (decoded && decoded.role === 'user') {
                 req.userId = decoded._id;
                 req.username = decoded.username;
@@ -152,6 +152,7 @@ const isApp = function (req, res, next) {
 
 const isLeagueUp = function (req, res, next) {
     let league;
+
     if (req.params.leagueSpec)
         league = req.params.leagueSpec;
     else if (req.body.leagueSpec)
@@ -168,7 +169,6 @@ const isLeagueUp = function (req, res, next) {
                 return res.sendStatus(404);
             else if (league && (league.available == false || league.end_date <= Date.now() || league.start_date >= Date.now())) // league is not up
                 return res.sendStatus(404);
-
             else {
                 req.league = league;
                 next();
@@ -177,7 +177,6 @@ const isLeagueUp = function (req, res, next) {
     }
     else {
         return res.sendStatus(404);
-
     }
 
 };

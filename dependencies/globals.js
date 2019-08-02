@@ -3,3 +3,4 @@ global.APP_NAME = 'PlayWin.apk';
 global.COIN_PRICE = 1; // "Toman
 global.COIN_TRESHOLD_TO_EXCHANGE = 20;
 global.ADVERTISE_AWARD_OPPO = 1;
+global.SMS_SERVICE = 'KAVENEGAR'; // [KAVENEGAR, PARSGREEN]

@@ -15,7 +15,9 @@ const boxSchema = new Schema({
 
     end_date:{type:Date},
 
-    image: {type:String}
+    image: {type:String},
+
+    payLink: {type: String}
 });
 
 module.exports = mongoose.model('box', boxSchema);

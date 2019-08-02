@@ -121,16 +121,37 @@ router.put('/', isUser, (req, res) => {
 
     const extraOppo = req.query.extraOppo;
     const info = _.pick(req.body, 'avatar', 'account');
-      debug(req.body);
     User.findOneAndUpdate({_id:req.userId},{...info,$inc:{opportunities:extraOppo == 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
         if(err)
-            res.status(500).send(err);
+            res.sendStatus(500);
         else if (!user)
             res.sendStatus(404);
-        else res.status(200).send(user);
+        else {
+            if(!info.avatar){
+                return res.status(200).send(user);
+            }
+           else {
+               if(user.participated_leagues) {
+                   user.participated_leagues.forEach(leagueId =>{
+                       League.findById(leagueId,(err,league)=>{
+                           if(league && mongoose.modelNames().indexOf(league.spec) > -1) {
+                               const Scoreboard = mongoose.model(league.spec);
+                               Scoreboard.findOneAndUpdate({user:req.userId},{avatar:info.avatar},(err,record)=>{
+                                   if(err) return res.sendStatus(500);
+                               });
+                           }
+                       });
+                   });
+                   return res.status(200).send(user);
+               }
+
+            }
+        }
     });
 
 });
+
+
 
 router.get('/leagues', isUser, (req, res) => {
     let leagueState = {available: true}; //just available leagues must be shown to user.
@@ -480,6 +501,8 @@ debug(req.userId);
 
 
 });
+
+
 
 router.get('/exchangeCoinToMoney/:coins',isUser,(req,res)=>{
     const coins = req.params.coins;

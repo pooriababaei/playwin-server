@@ -32,14 +32,14 @@ router.put('/',isAdmin, function (req, res) {
     })
 });
 router.post('/login', function (req, res) {
-    console.log(req.body)
+    console.log(req.body);
     if (req.body.hasOwnProperty('password')) {
         const pass = req.body.password;
         if (req.body.hasOwnProperty('username')) {
             const usernameOrEmail = req.body.username;
             Admin.findByUsername(usernameOrEmail, pass).then(admin => {
                 const token = admin.generateToken();
-                console.log(admin);
+                console.log(token);
                 return res.status(200).send({token:token});
             }).catch(() => {
                 console.log('sdfsdfs');
@@ -372,7 +372,6 @@ router.post('/league', leagueUpload, (req, res) => {
          'loyaltyGivensNumber','awardCoinsNumber');
     info.default_opportunities = info.default_opportunities - 1;
 
-console.log(req.files);
     if (req.files && req.files.mainImage) {
         mainImage = '/public/leagues/' + req.body.name + '/' + req.files.mainImage[0].filename;
         info.mainImage = mainImage;
@@ -474,15 +473,14 @@ router.put('/league/:id', leagueUpload, (req, res) => {
     })
 });
 router.delete('/league/:id', (req, res) => {
-    League.findOneAndRemove({_id: req.params.id},{new:true}, (err, league) => {
-        debug(req.body.id);
+    League.findOneAndRemove({_id: req.params.id},{new:true}).lean().exec((err, league) => {
         if (err) {
             debug(err);
             return res.status(500).send(err);
         }
         else if (league) {
              mongoose.connection.collections[league.spec].drop(function(err) {
-             debug('collection dropped');
+                 if(!err) delete mongoose.connection.models[league.spec];
              });
             rimraf.sync(path.join(__dirname, '../public/leagues', league.name));
             return res.status(200).send({data:league});
