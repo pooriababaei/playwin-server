@@ -232,7 +232,7 @@ router.get('/modifyScoreboard/:leagueSpec/:type', isUser, isLeagueUp, (req, res)
                     }
 
                     else if (result && result.opportunities > 0) {
-                        if (!req.league.max_opportunities || (req.league.max_opportunities && req.league.max_opportunities >= result.played)) {
+                        if (!req.league.max_opportunities || (req.league.max_opportunities && req.league.max_opportunities > result.played)) {
                             let newRecord = result;
                             newRecord.opportunities = result.opportunities - 1;
                             newRecord.played = result.played + 1;
