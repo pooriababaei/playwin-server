@@ -7,7 +7,11 @@ const boxTransactionSchema = new Schema({
 
     username: {type: String},
 
-    transactionId: {type: 'String'},
+    authority: {type: String},
+
+    amount: {type:Number},
+
+    refId: {type:String},
 
     box: {type: Schema.Types.ObjectId, ref: 'box'},
 

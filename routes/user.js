@@ -2,8 +2,12 @@ let express = require('express');
 const async = require('async');
 const _ = require('underscore');
 const path = require('path');
+const fs = require('fs');
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
+const merchantId = fs.readFileSync(path.join(__dirname, '../keys/merchant_key')).toString();
+const ZarinpalCheckout = require('zarinpal-checkout');
+const zarinpal = ZarinpalCheckout.create(merchantId, false);
 const User = mongoose.model('user');
 const League = mongoose.model('league');
 const Game = mongoose.model('game');
@@ -118,7 +122,6 @@ router.get('/', isUser,(req,res)=>{
 });
 
 router.put('/', isUser, (req, res) => {
-
     const extraOppo = req.query.extraOppo;
     const info = _.pick(req.body, 'avatar', 'account');
     User.findOneAndUpdate({_id:req.userId},{...info,$inc:{opportunities:extraOppo == 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
@@ -151,7 +154,7 @@ router.put('/', isUser, (req, res) => {
 
 });
 
-
+////////////////////////////////////////////////
 
 router.get('/leagues', isUser, (req, res) => {
     let leagueState = {available: true}; //just available leagues must be shown to user.
@@ -482,10 +485,12 @@ router.get('/pagingUsers/:leagueSpec/:limit/:page', isUser, (req, res) => {
 
 });
 
+////////////////////////////////////////////////
+
 router.get('/exchangeTotalOppoToLeagueOppo/:leagueSpec/:opportunities/', isUser, isLeagueUp, (req, res) => {
     const league = req.league;
     const oppo = req.params.opportunities;
-debug(req.userId);
+    debug(req.userId);
     debug(req.username);
     debug(oppo);
     debug(league);
@@ -495,35 +500,36 @@ debug(req.userId);
     }).catch(err => {
         debug(err);
         if(err == 1 || err == 2)
-           return res.status(400).send({code:err});
+            return res.status(400).send({code:err});
         res.status(500).send(err.toString());
     });  //if throws 1 not enough oppo. if throws 2 max_opportunities bound(client mistake). otherwise returns updated user and record
 
 
 });
 
-
-
 router.get('/exchangeCoinToMoney/:coins',isUser,(req,res)=>{
-    const coins = req.params.coins;
+    const coins = parseInt(req.params.coins);
            try{
-               if(parseInt(coins) <=0) return res.sendStatus(400);
-               if(parseInt(coins) < COIN_TRESHOLD_TO_EXCHANGE) return res.status(400).send({code: 1}); // Less than treshold for exchange. somehow is the client bug.
+               if(isNaN(coins) || coins <=0) return res.sendStatus(400);
+               if(coins < COIN_TRESHOLD_TO_EXCHANGE) return res.status(400).send({code: 1}); // Less than treshold for exchange. somehow is the client bug.
+               exchangeCoinToMoney(req.userId,coins).then(result=>{
+                   res.status(200).send(result.toString());
+               }).catch(err => {
+                   debug(err);
+                   if(err == 2)
+                       return res.status(400).send({code: err});
+                   res.sendStatus(500);
+               });
            }catch (e) {
                debug(e)
                return res.sendStatus(400);
            }
-           exchangeCoinToMoney(req.userId,parseInt(coins)).then(result=>{
-               res.status(200).send(result.toString());
-           }).catch(err => {
-               debug(err);
-               if(err == 2)
-                   return res.status(400).send({code: err});
-               res.sendStatus(500);
-           });
+
 
 
 });
+
+////////////////////////////////////////////////
 
 router.get('/boxes', isUser, (req, res) => {
     Box.find((err, result) => {
@@ -531,6 +537,50 @@ router.get('/boxes', isUser, (req, res) => {
         return res.status(200).send(result);
     })
 });
+
+router.get('/boxPurchase/:boxId',isUser,(req,res)=> {
+    Box.findById(req.params.boxId,(err,box)=>{
+        if(err) return res.sendStatus(500);
+        if(!box) return res.sendStatus(400);
+        else {
+            let price = box.offPrice ? box.offPrice : box.price;
+            zarinpal.PaymentRequest({
+                Amount: price, // In Tomans
+                CallbackURL: PLAYWIN_API_URL + '/user/validatePurchase',
+                Description: 'خرید کوپن فرصت',
+                Mobile: req.phoneNumber
+            }).then(response => {
+                if (response.status === 100)  return res.status(200).send({goTo:`https://www.zarinpal.com/pg/StartPay/${response.url}/MobileGate`});
+                else return res.sendStatus(500);
+
+            }).catch(err => {
+                return res.sendStatus(500);
+            });
+        }
+    })
+});
+
+router.get('/validatePurchase',(req,res)=> {
+    const authority = req.query.authority;
+    const status = req.query.status;
+    if(status ==='OK') {
+        zarinpal.PaymentVerification({
+            Amount: '1000', // In Tomans
+            Authority: '000000000000000000000000000000000000',
+        }).then(response => {
+            if (response.status === -21) {
+                console.log('Empty!');
+            } else {
+                console.log(`Verified! Ref ID: ${response.RefID}`);
+            }
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+});
+
+////////////////////////////////////////////////
 
 router.get('/games', isUser, (req, res) => {
     let gameState = {available: true};
@@ -542,6 +592,8 @@ router.get('/games', isUser, (req, res) => {
         return res.status(200).json(games);
     });
 });
+
+////////////////////////////////////////////////
 
 router.get('/resizedImage',isUser,(req,res)=>{
     const image = req.query.imagePath;
