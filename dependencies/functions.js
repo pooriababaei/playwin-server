@@ -30,12 +30,9 @@ function createDirectories() {
         fs.mkdirSync(dir3);
 }
 function sendSMS(phone,code) {
-    // fetchUri(`https://login.parsgreen.com/UrlService/sendSMS.ashx?from=10001398&to=${phone}&&text=${code}&signature=EB85462A-896D-4358-BC88-B7892B9F83EE`, function (error, meta, body) {
-    //     //     console.log(body.toString());
-    //     // });
     var Kavenegar = require('kavenegar');
     var api = Kavenegar.KavenegarApi({apikey: '724658576A51787A35486A4C7546714A534F376A4A433856495372384A5A3673'});
-    api.Send({ message: `کد فعال سازی شما: ${code}`, sender: "1000596446" , receptor: phone });
+    api.Send({ message: `کد فعال سازی شما در پلی وین: ${code}`, receptor: phone });
 }
 
 module.exports = {replaceIdWith_IdInArray, replaceIdWith_Id,createDirectories,sendSMS};

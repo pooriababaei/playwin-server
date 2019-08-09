@@ -23,7 +23,7 @@ const debug = require('debug')('User Route:');
 
 router.get('/checkNewVersion/:version', (req, res) => {
     if (req.params.version < newestAppVersion)                   //there is a new version
-        return res.status(200).json({code: 1, path: '/public/new_app/' + APP_NAME});
+        return res.status(200).json({code: 1, path: ''});
     return res.status(200).json({code: 0});
 });
 
@@ -33,7 +33,7 @@ router.get('/getAuthCode/:phone', (req, res) => {  //check inside later
     };
 
     let auth = new Auth(info);
-    if (info.phoneNumber.length == 10 && info.phoneNumber.match("0{0,1}9[0-9]{9}$")) {
+    if ((info.phoneNumber.length == 10 || info.phoneNumber.length == 11) && info.phoneNumber.match("0{0,1}9[0-9]{9}$")) {
         auth.save((err, auth) => {
             if (err)
                 return res.status(400).send();
