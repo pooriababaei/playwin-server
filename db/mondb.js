@@ -1,7 +1,4 @@
-const {url, dbUrl, dbName} = require('./configDb');
-const MongoClient = require('mongodb').MongoClient;
-const client = new MongoClient(url, {useNewUrlParser: true});
-//const client = new MongoClient(url, {useNewUrlParser: true,replicaSet: 'rs'});
+const { dbUrl} = require('./configDb');
 const debug = require('debug')('Mondb:');
 
 const mongoose = require('mongoose');
@@ -16,7 +13,7 @@ require('./models/user');
 require('./models/auth');
 require('./models/game');
 require('./models/league');
-require('./models/boxTransaction');
+require('./models/boxPurchase');
 require('./models/toPay');
 require('./models/admin');
 require('./models/box');
@@ -25,8 +22,8 @@ require('./models/avatar');
 const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
-mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then(() => {
-//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs'}).then(() => {
+mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
+//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs', autoIndex: false}).then(() => {
 
     League.find((err, leagues) => {
         if(err) {
@@ -45,8 +42,6 @@ mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then((
 
 
 module.exports = {
-    client,
-    dbName,
     mongoose
 };
 

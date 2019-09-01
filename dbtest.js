@@ -1,4 +1,4 @@
-const {url, dbUrl, dbName} = require('./dependencies/configDb');
+const {url, dbUrl, dbName} = require('./db/configDb');
 const MongoClient = require('mongodb').MongoClient;
 const client = new MongoClient(url, {useNewUrlParser: true});
 //const client = new MongoClient(url, {useNewUrlParser: true,replicaSet: 'rs'});
@@ -15,14 +15,14 @@ mongoose.Promise = global.Promise;
 // require('./dependencies/models/user');
 // require('./models/auth');
 // require('./models/game');
- require('./dependencies/models/league');
+ require('./db/models/league');
 // require('./models/boxTransaction');
 // require('./models/toPay');
 // require('./models/box');
 // require('./models/avatar');
 
 const League = mongoose.model('league');
-const scoreboardSchema = require('./dependencies/models/scoreboard');
+const scoreboardSchema = require('./db/models/scoreboard');
 
 mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then(() => {
 //mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs'}).then(() => {

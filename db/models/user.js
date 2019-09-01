@@ -8,9 +8,9 @@ const userSchema = new Schema({
 
     username: {type: String, required: true, unique: true, trim: true, set: toLower, index:true},
 
-    invitingUsers: [{type: Schema.Types.ObjectId, ref: 'user'}],
+    invitingUsers: [{type: Schema.Types.ObjectId, ref : 'user'}],
 
-    coins: {type: Number, default: 0},
+    coins: {type: Number, default: 0, index : true},
 
     opportunities: {type: Number, default: 100},
 
@@ -20,7 +20,7 @@ const userSchema = new Schema({
 
     account: {type: String},
 
-    loyalty: {type: Number, default: 0},
+    loyalty: {type: Number, default: 0, index : true},
 
     avatar: {type: String, default:'0'},
 
@@ -41,25 +41,22 @@ function toLower(v) {
 
 userSchema.methods.generateToken = function () {
     let user = this;
-    const token = jwt.sign({
+    return jwt.sign({
         _id: user._id,
         username: user.username,
         phoneNumber: user.phoneNumber,
         avatar:user.avatar,
         role: 'user'
     }, user_key).toString();
-    return token;
-
 };
 
 userSchema.statics.findByUsername = function (username, password) {
-    var User = this;
+    const User = this;
 
     return User.findOne({username}).then((user) => {
         if (!user) {
             return Promise.reject();
         }
-
         return new Promise((resolve, reject) => {
             // Use bcrypt.compare to compare password and user.password
             bcrypt.compare(password, user.password, (err, res) => {

@@ -53,9 +53,9 @@ const leagueStorage = multer.diskStorage({
             fs.mkdirSync(dir + '/images');
 
         if (file.fieldname === 'images')
-            callback(null, path.join(__dirname, '../public/leagues', req.body.name, 'images'));
+            callback(null, path.join(__dirname, '../public/leagues', req.body.spec, 'images'));
         else
-            callback(null, path.join(__dirname, '../public/leagues', req.body.name));
+            callback(null, path.join(__dirname, '../public/leagues', req.body.spec));
 
     },
     filename: function (req, file, callback) {

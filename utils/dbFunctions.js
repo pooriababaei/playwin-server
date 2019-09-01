@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-const Box_Transaction = mongoose.model('boxTransaction');
+const BoxPurchase = mongoose.model('boxPurcahse');
 const Box = mongoose.model('box');
 const ToPay = mongoose.model('toPay');
 const User = mongoose.model('user');
 const League = mongoose.model('league');
-const {client, dbName} = require('../dependencies/mondb');
-const debug = require('debug')('dbFunctions');
+const debug = require('debug')('dbFunctions:');
 
 
 
@@ -18,70 +17,17 @@ async function surroundingUsers(league, userId, limit) {
             user: {$ne: userId},
             $or: [{score: {$lt: user.score}},
                 {$and: [{score: user.score}, {updatedAt: {$gt: user.updatedAt}}]}]
-        }).sort({score: -1, updatedAt: 1}).limit(limit),
+        }).sort({score: -1, updatedAt: 1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
 
         Scoreboard.find({
             user: {$ne: userId},
             $or: [{score: {$gt: user.score}},
                 {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
-        }).sort({score: 1, updatedAt: -1}).limit(limit),
+        }).sort({score: 1, updatedAt: -1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
     ]);
 
     return better.reverse().concat(user).concat(worse);
 }   // doesn't show ranks
-
-async function edgeUsersRank(league,edge1,edge2) {
-    const Scoreboard = mongoose.model(league);
-    const count = await Scoreboard.count();
-    const responseInfo  ={};
-    if(edge1 != null && edge1 != 0 &&  edge1 < count) {
-        responseInfo.edge1User = await new Promise((resolve, reject) => {
-            client.connect(function (err, client) {
-                if (err) {
-                    reject(err);
-                }
-                const db = client.db(dbName);
-                const sort = {score: -1, updatedAt: 1};
-
-                db.collection(league)
-                    .find()
-                    .sort(sort)
-                    .limit(1)
-                    .skip(parseInt(edge1) - 1)
-                    .toArray(function (err, result) {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(result);
-                    });
-            });
-        });
-    }
-    if(edge2 != null && edge2 != 0 &&  edge2 < count) {
-        responseInfo.edge2User = await new Promise((resolve, reject) => {
-            client.connect(function (err, client) {
-                if (err) {
-                    reject(err);
-                }
-                const db = client.db(dbName);
-                const sort = {score: -1, updatedAt: 1};
-
-                db.collection(league)
-                    .find()
-                    .sort(sort)
-                    .limit(1)
-                    .skip(parseInt(edge2) -1)
-                    .toArray(function (err, result) {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve(result);
-                    });
-            });
-        });
-    }
-    return  responseInfo;
-}
 
 async function surroundingUserRanks(league, userId, limit) {
     const Scoreboard = mongoose.model(league);
@@ -99,53 +45,65 @@ async function surroundingUserRanks(league, userId, limit) {
             user: {$ne: userId},
             $or: [{score: {$lt: user.score}},
                 {$and: [{score: user.score}, {updatedAt: {$gt: user.updatedAt}}]}]
-        }).sort({score: -1, updatedAt: 1}).limit(limit),
+        }).sort({score: -1, updatedAt: 1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
 
         Scoreboard.find({
             user: {$ne: userId},
             $or: [{score: {$gt: user.score}},
                 {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
-        }).sort({score: 1, updatedAt: -1}).limit(limit),
+        }).sort({score: 1, updatedAt: -1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
     ]);
 
     let page = better.reverse().concat(user).concat(worse);
     const userIndex = page.findIndex(function (record) {
-        return record.user == userId;
+        return record.user === userId;
     });
 
-
-    let ranks = [];
-    for (let i = 0; i < page.length; i++) {
-        const o = {...page[i]._doc, rank: rank + (i - userIndex)};
-        ranks.push(o);
-
-    }
-    return ranks;
+    for (let i = 0; i < page.length; i++)
+        page[i].rank = rank + (i - userIndex);
+    return page;
 
 }
 
-function pagingUsers(league, limit, page) {
-    return new Promise((resolve, reject) => {
-        client.connect(function (err, client) {
-            if (err) {
-                reject(err);
-            }
-            const db = client.db(dbName);
-            const sort = {score: -1, updatedAt: 1};
-
-            db.collection(league)
-                .find()
+async function edgeUsersRank(league,edge1,edge2) {
+    const Scoreboard = mongoose.model(league);
+    const count = await Scoreboard.find().countDocuments();
+    const sort = {score: -1, updatedAt: 1};
+    const responseInfo  ={};
+    if(edge1 != null && edge1 !== 0 &&  edge1 < count) {
+        responseInfo.edge1User =
+           await Scoreboard.find()
+                .limit(1)
+                .skip(parseInt(edge1) - 1)
                 .sort(sort)
-                .limit(limit)
-                .skip(limit * (page - 1))
-                .toArray(function (err, result) {
-                    if (err) {
-                        reject(err);
-                    }
-                    resolve(result);
-                });
-        });
-    });
+                .exec();
+    }
+    if(edge2 != null && edge2 !== 0 &&  edge2 < count) {
+        responseInfo.edge2User =
+            await Scoreboard.find()
+                .limit(1)
+                .skip(parseInt(edge2) - 1)
+                .sort(sort)
+                .exec();
+    }
+    return  responseInfo;
+}
+
+function pagingUsers(league, limit, page) {
+     return new Promise((resolve, reject) => {
+         const Scoreboard = mongoose.model(league);
+         const sort = {score: -1, updatedAt: 1};
+         Scoreboard.find()
+             .limit(limit)
+             .skip(limit * (page - 1))
+             .sort(sort)
+             .exec(function (err, result) {
+                 if (err) {
+                     reject(err);
+                 }
+                 resolve(result);
+             });
+     });
 }
 
 async function userRank(league, userId) {
@@ -160,51 +118,6 @@ async function userRank(league, userId) {
     if (!count)
         return 1;
     return count + 1;
-}
-
-async function exchangeTotalOppoToLeagueOppo1(userId, username, oppo, league) {
-
-    const Scoreboard = mongoose.model(league.spec);
-    const userInfo = await User.findById(userId);
-    if (userInfo && userInfo.opportunities >= oppo) {
-
-        const record = await Scoreboard.findOne({user: userId});
-        let newRecord = null;
-
-        if (!record) {
-            if (league.max_opportunities && oppo > league.max_opportunities) {
-                return 2 //this is somehow a bad request. client mistake!!!
-            }
-            newRecord = {
-                user: userId,
-                username: username,
-                played: 0,
-                opportunities: league.default_opportunities + oppo,
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            };
-        }
-        else if (record) {
-            debug(parseInt(record.played) + parseInt(oppo))
-            if (league.max_opportunities && parseInt(record.played) + parseInt(oppo) > parseInt(league.max_opportunities)) {
-                return 2 //this is somehow a bad request. client mistake!!!
-            }
-
-            newRecord = record;
-            newRecord.opportunities = parseInt(record.opportunities) < 0 ? (parseInt(record.opportunities) + 1 + parseInt(oppo)) : (parseInt(record.opportunities) + parseInt(oppo));
-        }
-
-        const newRecordToSave = new Scoreboard(newRecord);
-        const [nr, user] = await Promise.all([newRecordToSave.save(), User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: 0 - oppo}}, {new: true})]);
-
-        return {record: nr, user: user};
-
-
-    }
-    else
-        return 1; // not enough oppo
-
-
 }
 
 async function exchangeTotalOppoToLeagueOppo(userId, username, oppo, league) {  // transaction 
@@ -295,20 +208,25 @@ async function giveAwards(leagueSpec) {
     session.startTransaction();
     try {
         const opts = {session};
-        const league = await League.findOne({spec: leagueSpec});
+        const league = await League.findOne({spec: leagueSpec}).lean();
+        if(!league)
+            throw 404;
+        if(league.end_time >= Date.now() || league.rewarded === true)
+            throw 400;
         const coinUsers = await pagingUsers(league.spec,league.leadersNumber,1);
-        const loyaltyUsers = await pagingUsers(league.spec,league.loyaltyGivensNumber,1);
-        coinUsers.forEach(record => {
-            User.findOneAndUpdate({_id: record.user},
-                {$inc: {coins: league.awardCoinsNumber}});
-        });
-        loyaltyUsers.forEach(record => {
-            User.findOneAndUpdate({_id: record.user},
-                {$inc: {loyalty:league.awardLoyaltyNumber}});
-        });
+     //   const loyaltyUsers = await pagingUsers(league.spec,league.loyaltyGivensNumber,1);
+        for (const record of coinUsers) {
+          await  User.findOneAndUpdate({_id: record.user},
+                {$inc: {coins: league.rewardCoinNumber}});
+        }
+        // loyaltyUsers.forEach(record => {
+        //     User.findOneAndUpdate({_id: record.user},
+        //         {$inc: {loyalty:league.rewardLoyaltyNumber}});
+        // });
+        const newLeague = await League.findOneAndUpdate({spec:leagueSpec},{rewarded : true},{new:true});
         await session.commitTransaction();
         session.endSession();
-        return true;
+        return newLeague;
     }
     catch (error) {
         await session.abortTransaction();
@@ -318,13 +236,12 @@ async function giveAwards(leagueSpec) {
 } //admin  remember too add opts fot transactions working
 
 function saveBoxTransaction(userId, username, transactionId, boxId) {
-    const t = {
+    const p = {
         user: userId,
-        username: username,
         transactionId: transactionId,
         box: boxId
     };
-    const transaction = new Box_Transaction(t);
+    const transaction = new BoxPurchase(p);
 
     return new promise((resolve, reject) => {
         transaction.save((err, transaction) => {
@@ -339,7 +256,7 @@ function saveBoxTransaction(userId, username, transactionId, boxId) {
 
 async function buyBox(userId, username, transactionId, boxId) {
     const box = await Box.findById(boxId);
-    const [user, bt] = Promise.all([User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: box.opportunities}}, {new: true}), saveBoxTransaction(userId, username, transactionId, boxId)])
+    const [user, bt] = Promise.all([User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: box.opportunities}}, {new: true}), saveBoxTransaction(userId, username, transactionId, boxId)]);
     return {user: user, transaction: bt};
 
 }  //not sure how the usage will be. from client or an payment api.
@@ -347,7 +264,6 @@ async function buyBox(userId, username, transactionId, boxId) {
 
 module.exports = {
     surroundingUsers,
-    pagingUsers,
     userRank,
     surroundingUserRanks,
     edgeUsersRank,

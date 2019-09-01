@@ -1,11 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const boxTransactionSchema = new Schema({
+const boxPurchaseSchema = new Schema({
 
     user: {type: Schema.Types.ObjectId, ref: 'user'},
-
-    username: {type: String},
 
     authority: {type: String},
 
@@ -22,4 +20,4 @@ const boxTransactionSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('boxTransaction', boxTransactionSchema);
+module.exports = mongoose.model('boxPurcahse', boxPurchaseSchema);

@@ -9,15 +9,18 @@ var serve = require('serve-index');
 var RateLimit = require('express-rate-limit');
 var RedisStore = require('rate-limit-redis');
 
-require('./dependencies');
+require('./db');
 
-const{isUserOrAdmin} = require('./dependencies/middleware');
+const{isUserOrAdmin} = require('./utils/middlewares');
 
 const routes = {
-    admin: require('./routes/admin'),
-    user: require('./routes/user'),
-    superadmin:require('./routes/superadmin')
-
+    admin: require('./routes/adminRoutes'),
+    user: require('./routes/userRoutes'),
+    league: require('./routes/leagueRoutes'),
+    scoreboard: require('./routes/scoreboardRoutes'),
+    box: require('./routes/boxRoutes'),
+    game: require('./routes/gameRoutes'),
+    currency: require('./routes/currencyRoutes')
 };
 var app = express();
 
@@ -52,13 +55,16 @@ app.use(morgan('combined', { stream: accessLogStream }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true,parameterLimit: 1000000}));
 app.use(cookieParser());
-//app.use('^\\/((user|admin)\\/.+$|public\\/((games|leagues)\\/([^/]+)\\/(([^/]+)$|images\\/([^/]+))$|([^/]+)\\/([^/]+)$))',isUserOrAdmin);
+app.use('^\\/.+\\.(html|zip)$',isUserOrAdmin);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/ftp', express.static('public'), serve('public', {'icons': true}));
 
-app.use('/api/user', routes.user);
-app.use('/api/admin/admin',routes.superadmin);
-app.use('/api/admin', routes.admin);
-
+app.use('/users', routes.user);
+app.use('/admins', routes.admin);
+app.use('/leagues',routes.league);
+app.use('/scoreboards',routes.scoreboard);
+app.use('/currencies',routes.currency);
+app.use('/boxes', routes.box);
+app.use('/games', routes.game);
 
 module.exports = app;

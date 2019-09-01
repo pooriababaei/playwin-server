@@ -13,7 +13,7 @@ const boxSchema = new Schema({
 
     loyalties:{type:Number},
 
-    end_date:{type:Date},
+    end_time:{type:Date},
 
     image: {type:String},
 });

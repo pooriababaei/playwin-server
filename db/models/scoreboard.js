@@ -6,19 +6,15 @@ function scoreboard(opp, spec) {
 
             user: {type: Schema.Types.ObjectId, ref: 'user' , index:true},
 
-            username: {type: String},
-
-            score: {type: Number, default: 0},
+            score: {type: Number, default: 0, index:true},
 
             opportunities: {type: Number, default: opp},
 
             played: {type: Number, default: 1},
 
-            avatar:{type:String},
-
             createdAt: {type: Date},
 
-            updatedAt: {type: Date}
+            updatedAt: {type: Date, index : true}
 
         }, {collection: spec}
     );

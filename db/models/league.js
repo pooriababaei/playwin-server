@@ -12,21 +12,21 @@ const leagueSchema = new Schema({
 
     leadersNumber: {type :Number,default:0},
 
-    awardCoinsNumber: {type:Number,default:0},
+    rewardCoinNumber: {type:Number,default:0},
 
     loyaltyGivensNumber: {type:Number, default:0},
 
-    awardLoyaltyNumber:{type:Number, default:0},
+    rewardLoyaltyNumber:{type:Number, default:0},
 
-    awardsDone : {type: Boolean, default: false},
+    rewarded : {type: Boolean, default: false},
 
     default_opportunities: {type: Number, required : true} ,
 
     max_opportunities: {type: Number},
 
-    start_date: {type: Date},
+    start_time: {type: Date},
 
-    end_date: {type: Date},
+    end_time: {type: Date},
 
     available: {type: Boolean, default: false},
 
@@ -47,8 +47,8 @@ const leagueSchema = new Schema({
     secondaryColor : {type: String}
 });
 
-leagueSchema.virtual('id').get(function () {
-    return this._id;
-});
+// leagueSchema.virtual('id').get(function () {
+//     return this._id;
+// });
 
 module.exports = mongoose.model('league', leagueSchema);

@@ -13,17 +13,17 @@ const isUser = function (req, res, next) {
     if(req.headers.authorization == null)
         return res.sendStatus(401);
     const authArray = req.headers.authorization.toString().split(" ");
-    if (authArray.length != 2)
+    if (authArray.length !== 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
     const token = authArray[1];
 
 
-    if (bearer == "Bearer" && token) {
+    if (bearer === "Bearer" && token) {
         jwt.verify(token, user_key, function (err, decoded) {
             if (err)
                 return res.sendStatus(401);
-            if (decoded && decoded.role === 'user') {
+            if (decoded && decoded.role && decoded.role === 'user') {
                 req.userId = decoded._id;
                 req.username = decoded.username;
                 req.phoneNumber = decoded.phoneNumber;
@@ -43,19 +43,19 @@ const isAdmin = function (req, res, next) {
     if(req.headers.authorization == null)
         return res.sendStatus(401);
     const authArray = req.headers.authorization.toString().split(" ");
-    if (authArray.length != 2)
+    if (authArray.length !== 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
     const token = authArray[1];
 
-    if (bearer == "Bearer" && token) {
+    if (bearer === "Bearer" && token) {
         jwt.verify(token, admin_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
-            if (decoded && decoded.role === 'admin' || decoded.role === 'superadmin') {
+            if (decoded && decoded.role && (decoded.role === 'admin' || decoded.role === 'superadmin')) {
                 req.adminId = decoded._id;
                 req.email = decoded.email;
-                req.username = username;
+                req.username = decoded.username;
                 next();
             }
             else
@@ -71,19 +71,19 @@ const isSuperAdmin = function (req, res, next) {
     if(req.headers.authorization == null)
         return res.sendStatus(401);
     const authArray = req.headers.authorization.toString().split(" ");
-    if (authArray.length != 2)
+    if (authArray.length !== 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
     const token = authArray[1];
 
-    if (bearer == "Bearer" && token) {
+    if (bearer === "Bearer" && token) {
         jwt.verify(token, admin_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
-            if (decoded && decoded.role === 'superadmin') {
+            if (decoded && decoded.role && decoded.role === 'superadmin') {
                 req.adminId = decoded._id;
                 req.email = decoded.email;
-                req.username = username;
+                req.username = decoded.username;
                 next();
             }
             else
@@ -98,27 +98,28 @@ const isSuperAdmin = function (req, res, next) {
 const isUserOrAdmin = function (req, res, next) {
     if(req.headers.authorization == null)
         return res.sendStatus(401);
+
     const authArray = req.headers.authorization.toString().split(" ");
-    if (authArray.length != 2)
+    if (authArray.length !== 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
     const token = authArray[1];
 
-    if (bearer == "Bearer" && token) {
+
+    if (bearer === "Bearer" && token) {
         jwt.verify(token, user_key, function (err, decoded) {
-            if (decoded && decoded.role === 'user') {
+            if (decoded && decoded.role && decoded.role === 'user') {
                 req.userId = decoded._id;
                 req.phoneNumber = decoded.phoneNumber;
                 next();
             }
             else {
                 jwt.verify(token, admin_key, function (err, decoded) {
-                    if (decoded && decoded.role === 'admin') {
+                    if (decoded && decoded.role && (decoded.role === 'admin' || decoded.role === 'superadmin')) {
                         req.adminId = decoded._id;
                         req.email = decoded.email;
                         next();
                     }
-
                     else return res.sendStatus(401);
 
                 });
@@ -167,7 +168,7 @@ const isLeagueUp = function (req, res, next) {
                 return res.sendStatus(500);
             else if (!league)
                 return res.sendStatus(404);
-            else if (league && (league.available == false || league.end_date <= Date.now() || league.start_date >= Date.now())) // league is not up
+            else if (league && (league.available === false || league.end_time <= Date.now() || league.start_time >= Date.now())) // league is not up
                 return res.sendStatus(404);
             else {
                 req.league = league;
@@ -196,7 +197,7 @@ const isLeagueUp = function (req, res, next) {
                 return res.sendStatus(500);
             else if (!league)
                 return res.sendStatus(404);
-            else if (league && (league.available == false || league.end_date <= Date.now() || league.start_date >= Date.now())) // league is not up
+            else if (league && (league.available == false || league.end_time <= Date.now() || league.start_time >= Date.now())) // league is not up
                 return res.sendStatus(404);
 
             else {

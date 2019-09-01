@@ -14,7 +14,15 @@ const gameSchema = new Schema({
 
     gif: {type: String},
 
-    game: {type: String}
+    game: {type: String},
+
+    html:{type: String},
+
+    gameZip : {type :String},
+
+    baseColor : {type: String},
+
+    secondaryColor : {type: String}
 
 
 });

@@ -1,20 +1,5 @@
 const fs = require('fs');
 const path= require('path');
-const fetchUri = require('fetch').fetchUrl;
-const replaceIdWith_IdInArray = (arr) => {
-    return arr.map(item => {
-        let temp = item._doc;
-        temp.id = temp._id;
-        delete temp._id;
-        return temp;
-    });
-};
-const replaceIdWith_Id = (item) => {
-    let temp = item._doc;
-    temp.id = temp._id;
-    delete temp._id;
-    return temp;
-};
 function createDirectories() {
     const dir = path.join(__dirname, '../public/');
     const dir1 = path.join(__dirname, '../public/leagues');
@@ -35,4 +20,4 @@ function sendSMS(phone,code) {
     api.Send({ message: `کد فعال سازی شما در پلی وین: ${code}`, receptor: phone });
 }
 
-module.exports = {replaceIdWith_IdInArray, replaceIdWith_Id,createDirectories,sendSMS};
+module.exports = {createDirectories,sendSMS};
