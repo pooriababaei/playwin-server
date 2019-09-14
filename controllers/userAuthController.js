@@ -38,7 +38,7 @@ function auth (req,res){
                 if (err) return res.sendStatus(500);
                 if (user) {     // user exists.
                     const token = user.generateToken();
-                    return res.status(200).json({token: token});
+                    return res.status(200).json({token: token , userId: user._id});
                 }
                 else if (!user) {
                     return res.status(200).send(userAuth);
@@ -88,7 +88,7 @@ async function signup (req,res) {
                     if (err) debug(err);
                 });
             }
-            return res.status(200).json({token: user.generateToken()});
+            return res.status(200).json({token: user.generateToken() , userId: user._id});
         }
     });
 }

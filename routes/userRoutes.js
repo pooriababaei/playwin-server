@@ -15,9 +15,9 @@ router.get('/checkUniqueUsername/:username',userAuthController.checkUniqueUserna
 router.post('/signup', userAuthController.signup);
 router.get('/usersCount',isAdmin, userController.usersCount);
 
-router.get('/',isUserOrAdmin,userController.getUsers);
+router.get('/',isAdmin,userController.getUsers);
 router
-    .route('/:id', isUser)
+    .route('/:id', isUser,userController.getUser)
     .get(userController.getUser)
     .put(userController.updateUser);
 
