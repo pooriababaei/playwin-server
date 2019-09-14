@@ -132,15 +132,15 @@ const isApp = function (req, res, next) {
     if(req.headers.authorization == null)
         return res.sendStatus(401);
     const authArray = req.headers.authorization.toString().split(" ");
-    if (authArray.length != 2)
+    if (authArray.length !== 2)
         return res.sendStatus(401);
     const bearer = authArray[0];
     const token = authArray[1];
-    if (bearer == "Bearer" && token) {
+    if (bearer === "Bearer" && token) {
         jwt.verify(token, app_key, function (err, decoded) {
             if (err)
                 return res.send(401).send();
-            if (decoded && decoded.app == true)
+            if (decoded && decoded.app === true)
                 next();
             else
                 return res.status(401).send();
@@ -154,12 +154,12 @@ const isApp = function (req, res, next) {
 const isLeagueUp = function (req, res, next) {
     let league;
 
-    if (req.params.leagueSpec)
-        league = req.params.leagueSpec;
-    else if (req.body.leagueSpec)
-        league = req.body.leagueSpec;
-    else if (req.query.leagueSpec)
-        league = req.query.leagueSpec;
+    if (req.params.collectionName)
+        league = req.params.collectionName;
+    else if (req.body.collectionName)
+        league = req.body.collectionName;
+    else if (req.query.collectionName)
+        league = req.query.collectionName;
 
     if (mongoose.modelNames().indexOf(league) > -1) {
        // debug(mongoose.modelSchemas)
@@ -168,7 +168,7 @@ const isLeagueUp = function (req, res, next) {
                 return res.sendStatus(500);
             else if (!league)
                 return res.sendStatus(404);
-            else if (league && (league.available === false || league.end_time <= Date.now() || league.start_time >= Date.now())) // league is not up
+            else if (league && (league.available === false || league.endTime < Date.now() || league.startTime > Date.now())) // league is not up
                 return res.sendStatus(404);
             else {
                 req.league = league;
@@ -184,12 +184,12 @@ const isLeagueUp = function (req, res, next) {
 
 /*const isLeagueUp = function (req, res, next) {
     let league;
-    if (req.params.leagueSpec)
-        league = req.params.leagueSpec;
-    else if (req.body.leagueSpec)
-        league = req.body.leagueSpec;
-    else if (req.query.leagueSpec)
-        league = req.query.leagueSpec;
+    if (req.params.collectionName)
+        league = req.params.collectionName;
+    else if (req.body.collectionName)
+        league = req.body.collectionName;
+    else if (req.query.collectionName)
+        league = req.query.collectionName;
 
     if (mongoose.modelNames().indexOf(league) > -1) {
         League.findOne({spec: league}, (err, league) => {
@@ -197,7 +197,7 @@ const isLeagueUp = function (req, res, next) {
                 return res.sendStatus(500);
             else if (!league)
                 return res.sendStatus(404);
-            else if (league && (league.available == false || league.end_time <= Date.now() || league.start_time >= Date.now())) // league is not up
+            else if (league && (league.available == false || league.endTime <= Date.now() || league.startTime >= Date.now())) // league is not up
                 return res.sendStatus(404);
 
             else {

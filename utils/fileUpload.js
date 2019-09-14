@@ -46,7 +46,7 @@ const gameUpload = multer({
 const leagueStorage = multer.diskStorage({
     destination: function (req, file, callback) {
 
-        const dir = path.join(__dirname, '../public/leagues', req.body.name);
+        const dir = path.join(__dirname, '../public/leagues', req.body.spec);
         if (!fs.existsSync(dir))
             fs.mkdirSync(dir);
         if (!fs.existsSync(dir + '/images'))

@@ -39,14 +39,13 @@ function toLower(v) {
 
 adminSchema.methods.generateToken = function () {
     let admin = this;
-    const token = jwt.sign({
+    return jwt.sign({
         _id: admin._id,
         username: admin.username,
         phoneNumber: admin.phoneNumber,
         email: admin.email,
         role: admin.role
     }, admin_key).toString();
-    return token;
 
 };
 

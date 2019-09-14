@@ -2,7 +2,10 @@ const _ = require('underscore');
 const path = require('path');
 const mongoose = require('mongoose');
 const rimraf = require('rimraf');
+const AdmZip = require('adm-zip');
+const urljoin = require('url-join');
 const League = mongoose.model('league');
+const scoreboardSchema = require('../db/models/scoreboard');
 const debug = require('debug')('League Controller:');
 
 
@@ -20,14 +23,14 @@ async function getLeagues (req,res) {
 
     if (filter && filter.running) {
         if (filter.running === 1) {  // up leagues
-            leagueState.end_time = {$gte: Date.now()};
-            leagueState.start_time = {$lte: Date.now()};
+            leagueState.endTime = {$gte: Date.now()};
+            leagueState.startTime = {$lte: Date.now()};
         }
         else if (filter.running === 2) {  //future leagues
-            leagueState.start_time = {$gt: Date.now()};
+            leagueState.startTime = {$gt: Date.now()};
         }
         else if (filter.running === 3) {  //past leagues
-            leagueState.end_time = {$lt: Date.now()};
+            leagueState.endTime = {$lt: Date.now()};
         }
     }
 
@@ -43,11 +46,12 @@ async function getLeagues (req,res) {
         if (!leagues)
             return res.sendStatus(404);
         for(const league of leagues) {
-           if(league.start_time < Date.now()) {
+           if(league.startTime < Date.now() && mongoose.modelNames().includes(league.spec)) {
                const Scoreboard = mongoose.model(league.spec);
-               league.playerCount = await Scoreboard.find().countDocuments;
+               league.playersNumber = await Scoreboard.find().countDocuments();
            }
         }
+
         return res.set({
             'Access-Control-Expose-Headers': 'x-total-count',
             'x-total-count': leagues.length
@@ -73,10 +77,10 @@ function createLeague (req,res) {
     let game;
     let gameZip;
 
-    const info = _.pick(req.body, 'name', 'spec', 'description', 'start_time', 'kind', 'end_time', 'available',
-        'default_opportunities', 'max_opportunities','html','baseColor','secondaryColor','leadersNumber',
-        'loyaltyGivensNumber','rewardCoinNumber');
-    info.default_opportunities = info.default_opportunities - 1;
+    const info = _.pick(req.body, 'name', 'spec', 'description', 'startTime', 'kind', 'endTime', 'available',
+        'defaultopportunities', 'maxopportunities','html','baseColor','secondaryColor','leadersNumber',
+        'loyaltiesGivensNumber','coinsRewardNumber');
+    info.defaultopportunities = info.defaultopportunities - 1;
 
     if (req.files && req.files.mainImage) {
         mainImage = '/public/leagues/' + req.body.spec + '/' + req.files.mainImage[0].filename;
@@ -90,15 +94,12 @@ function createLeague (req,res) {
     }
 
     if (req.files && req.files.game) {
-        // extract_zip(path.join(__dirname, '../public/leagues/', req.body.name, req.files.game[0].originalname),
-        //     {dir: path.join(__dirname, '../public/leagues/', req.body.name)}, (err) => {
-        //         if (err)
-        //             debug(err);
-        //     });
-        var zip = new AdmZip(path.join(__dirname, '../public/leagues/', req.body.spec, req.files.game[0].originalname));
+        let zip = new AdmZip(path.join(__dirname, '../public/leagues/', req.body.spec, req.files.game[0].originalname));
         zip.extractAllTo(path.join(__dirname, '../public/leagues/', req.body.spec), /*overwrite*/true);
 
-        game = urljoin('/public/leagues', req.body.spec , req.files.game[0].originalname.split('.')[0] , info.html);
+        const index = info.html ? info.html : 'index.html';
+
+        game = urljoin('/public/leagues', req.body.spec , req.files.game[0].originalname.split('.')[0] , index);
         gameZip = urljoin('/public/leagues', req.body.spec , req.files.game[0].originalname);
 
         info.game = game;
@@ -119,7 +120,7 @@ function createLeague (req,res) {
             debug(err);
             return res.status(400).send();
         }
-        mongoose.model(league.spec, scoreboardSchema(league.default_opportunities, league.spec));
+        mongoose.model(league.spec, scoreboardSchema(league.defaultopportunities, league.spec));
         return res.status(200).send(league);
     });
 }
@@ -131,10 +132,10 @@ function updateLeague (req,res) {
     let game;
     let gameZip;
 
-    const info = _.pick(req.body, 'name', 'spec', 'description', 'start_time', 'end_time', 'available',
-        'default_opportunities', 'max_opportunities','html','baseColor','secondaryColor','leadersNumber',
-        'loyaltyGivensNumber','rewardCoinNumber');
-    info.default_opportunities = info.default_opportunities - 1;
+    const info = _.pick(req.body, 'name', 'spec', 'description', 'startTime', 'endTime', 'available',
+        'defaultopportunities', 'maxopportunities','html','baseColor','secondaryColor','leadersNumber',
+        'loyaltiesGivensNumber','coinsRewardNumber', 'loyaltiesRewardNumber');
+    info.defaultopportunities = info.defaultopportunities - 1;
 
     if (req.files && req.files.mainImage) {
         mainImage = '/public/leagues/' + req.body.spec + '/' + req.files.mainImage[0].filename;

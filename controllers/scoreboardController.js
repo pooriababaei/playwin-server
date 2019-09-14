@@ -29,7 +29,7 @@ function modifyScoreboard (req, res) {
                                 return res.status(500).send(err);
                             if (record)
                                 User.findOneAndUpdate({_id: req.userId}, {
-                                    $push: {participated_leagues: req.league._id}
+                                    $push: {participatedLeagues: req.league._id}
                                 }, {new: true}, function (err, user) {
                                     if (err) debug(err);
                                     if (user)
@@ -41,7 +41,7 @@ function modifyScoreboard (req, res) {
                     }
 
                     else if (result && result.opportunities > 0) {
-                        if (!req.league.max_opportunities || (req.league.max_opportunities && req.league.max_opportunities > result.played)) {
+                        if (!req.league.maxopportunities || (req.league.maxopportunities && req.league.maxopportunities > result.played)) {
                             let newRecord = result;
                             newRecord.opportunities = result.opportunities - 1;
                             newRecord.played = result.played + 1;
@@ -59,7 +59,7 @@ function modifyScoreboard (req, res) {
                     }
 
                     else if (result && result.opportunities <= 0)
-                        return res.status(200).json({code: 1}); // no opportunity
+                        return res.status(200).json({code: 1}); // no opportunities
 
                 });
                 break;
@@ -78,7 +78,7 @@ function modifyScoreboard (req, res) {
                                 let newRecord = result;
                                 newRecord.score = score;
                                 newRecord.updatedAt = Date.now();
-                                if (result.opportunities == 0) //it won't let user
+                                if (result.opportunities === 0) //it won't let user
                                     newRecord.opportunities = result.opportunities - 1;
 
                                 newRecord.save((err, result1) => {
@@ -125,7 +125,7 @@ function modifyScoreboard (req, res) {
                                     return res.status(500).send(err);
                                 if (record)
                                     User.findOneAndUpdate({_id: req.userId}, {
-                                        $push: {participated_leagues: req.league._id}
+                                        $push: {participatedLeagues: req.league._id}
                                     }, {new: true}, function (err, user) {
                                         if (err) debug(err);
                                         if (user)
@@ -137,7 +137,7 @@ function modifyScoreboard (req, res) {
                         }
 
                         else if (result && result.opportunities > 0 && result.score < score) {
-                            if (!req.league.max_opportunities || (req.league.max_opportunities && req.league.max_opportunities >= result.played)) {
+                            if (!req.league.maxopportunities || (req.league.maxopportunities && req.league.maxopportunities >= result.played)) {
                                 let newRecord = result;
                                 newRecord.score = score;
                                 newRecord.opportunities = result.opportunities - 1;
@@ -176,7 +176,7 @@ function modifyScoreboard (req, res) {
                             username: req.username,
                             played:0,
                             avatar: req.avatar,
-                            opportunities: (req.league.max_opportunities && req.league.max_opportunities < req.league.default_opportunities + ADVERTISE_AWARD_OPPO) ? req.league.default_opportunities : req.league.default_opportunities + ADVERTISE_AWARD_OPPO,
+                            opportunities: (req.league.maxopportunities && req.league.maxopportunities < req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO) ? req.league.dafaultopportunities : req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO,
                             createdAt: Date.now(),
                             updatedAt: Date.now()
                         });
@@ -185,7 +185,7 @@ function modifyScoreboard (req, res) {
                                 return res.status(500).send(err);
                             if (record)
                                 User.findOneAndUpdate({_id: req.userId}, {
-                                    $push: {participated_leagues: req.league._id}
+                                    $push: {participatedLeagues: req.league._id}
                                 }, {new: true}, function (err, user) {
                                     if (err) debug(err);
                                     if (user)
@@ -193,7 +193,7 @@ function modifyScoreboard (req, res) {
                                 });
                         });
                     }
-                    else if (!req.league.max_opportunities || result && result.opportunities + result.played + ADVERTISE_AWARD_OPPO <=req.league.max_opportunities) {
+                    else if (!req.league.maxopportunities || result && result.opportunities + result.played + ADVERTISE_AWARD_OPPO <=req.league.maxopportunities) {
                         let newRecord = result;
                         newRecord.opportunities = result.opportunities + ADVERTISE_AWARD_OPPO;
                         newRecord.save((err, result1) => {
@@ -216,7 +216,7 @@ function modifyScoreboard (req, res) {
 }
 
 function userRecord (req, res) {
-    let Scoreboard = mongoose.model(req.params.leagueSpec);
+    let Scoreboard = mongoose.model(req.params.collectionName);
     if (!Scoreboard) return res.sendStatus(400);
 
     Scoreboard.findOne({user: req.userId}, (err, result) => {
@@ -231,7 +231,7 @@ function userRecord (req, res) {
 }
 
 function userRank (req, res) {
-    const league = req.params.leagueSpec;
+    const league = req.params.collectionName;
     dbFunctions.userRank(league, req.userId).then(rank => {
         if (rank)
             return res.status(200).json({rank: rank});
@@ -242,8 +242,8 @@ function userRank (req, res) {
     })
 }
 
-function surroundingUserRanks (req, res) {
-    const league = req.params.leagueSpec;
+function surroundingUsers (req, res) {
+    const league = req.params.collectionName;
     const limit = parseInt(req.params.limit);
 
     dbFunctions.surroundingUserRanks(league, req.userId, limit).then(page => {
@@ -253,32 +253,8 @@ function surroundingUserRanks (req, res) {
     })
 }
 
-function surroundingUsers (req,res) {
-    const id = req.userId;
-    const league = req.params.leagueSpec;
-    const limit = parseInt(req.params.limit);
-    debug(limit);
-    dbFunctions.surroundingUsers(league, id, limit).then(result => {
-        return res.status(200).json(result)
-    }).catch(err => {
-        debug(err);
-        return res.status(500).send();
-    });
-}
-
-function edgeUsersRank (req,res) {
-    const league = req.params.leagueSpec;
-    const edge1 = req.query.edge1;
-    const edge2 = req.query.edge2;
-    dbFunctions.edgeUsersRank(league,edge1,edge2).then(result =>{
-        return res.status(200).send(result);
-    }).catch(err =>{
-        return res.status(500).send(err);
-    });
-}
-
-async function pagingUsers (req,res) {
-    const league = req.params.leagueSpec;
+async function getRecords (req, res) {
+    const league = req.params.collectionName;
     const limit = parseInt(req.query.perPage);
     const page = parseInt(req.query.page);
    // let filter = req.query.filter;
@@ -302,5 +278,5 @@ async function pagingUsers (req,res) {
 }
 
 module.exports = {
-    modifyScoreboard, userRank, userRecord, surroundingUserRanks, surroundingUsers, edgeUsersRank, pagingUsers
+    modifyScoreboard, userRank, userRecord, surroundingUsers, pagingUsers: getRecords
 };

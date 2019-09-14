@@ -12,15 +12,15 @@ const userSchema = new Schema({
 
     coins: {type: Number, default: 0, index : true},
 
-    opportunities: {type: Number, default: 100},
+    coupons: {type: Number, default: 100},
 
-    participated_leagues: [{type: Schema.Types.ObjectId, ref: 'league'}],
+    participatedLeagues: [{type: Schema.Types.ObjectId, ref: 'league'}],
 
     phoneNumber: {type: String, required: true, unique: true , index: true},
 
     account: {type: String},
 
-    loyalty: {type: Number, default: 0, index : true},
+    loyalties: {type: Number, default: 0, index : true},
 
     avatar: {type: String, default:'0'},
 

@@ -5,13 +5,11 @@ const scoreboardController = require('../controllers/scoreboardController');
 const debug = require('debug')('Scorebaord Route:');
 
 
-router.get('/modifyScoreboard/:leagueSpec/:type', isUser, isLeagueUp, scoreboardController.modifyScoreboard);
-router.get('/userRecord/:leagueSpec',isUser,scoreboardController.userRecord);
-router.get('/userRank/:leagueSpec', isUser, scoreboardController.userRank);
-router.get('/surroundingUserRanks/:leagueSpec/:limit', isUser, scoreboardController.surroundingUserRanks);
-router.get('/surroundingUsers/:leagueSpec/:limit', isUser, scoreboardController.surroundingUsers);
-router.get('/edgeUsersRank/:leagueSpec',isUser, scoreboardController.edgeUsersRank);
-router.get('/:leagueSpec',isUserOrAdmin, scoreboardController.pagingUsers);
+router.get('/modifyScoreboard/:collectionName/:type', isUser, isLeagueUp, scoreboardController.modifyScoreboard);
+router.get('/userRecord/:collectionName',isUser,scoreboardController.userRecord);
+router.get('/userRank/:collectionName', isUser, scoreboardController.userRank);
+router.get('/surroundingUsers/:collectionName/:limit', isUser, scoreboardController.surroundingUsers);
+router.get('/:collectionName',isUserOrAdmin, scoreboardController.pagingUsers);
 
 
 module.exports=router;

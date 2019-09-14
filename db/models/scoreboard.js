@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-function scoreboard(opp, spec) {
+function scoreboard(opp, collectionName) {
     const scoreboardSchema = new Schema({
 
             user: {type: Schema.Types.ObjectId, ref: 'user' , index:true},
@@ -16,7 +15,7 @@ function scoreboard(opp, spec) {
 
             updatedAt: {type: Date, index : true}
 
-        }, {collection: spec}
+        }, {collection: collectionName}
     );
 
     scoreboardSchema.index({score: -1, updatedAt: 1});

@@ -24,10 +24,11 @@ function getBoxes(req, res) {
 
 function createBox (req, res) {
     const info = _.pick(req.body, 'name', 'price', 'offPrice');
-    if (req.file)
+    if (req.files)
         info.image = '/public/boxes/' + req.files.image[0].filename;
     const box = new Box(info);
     box.save((err, box) => {
+        debug(err)
         if (err) return res.sendStatus(500);
         if (box) return res.status(200).send(box);
         return res.sendStatus(400);

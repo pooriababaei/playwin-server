@@ -1,8 +1,6 @@
-const { dbUrl} = require('./configDb');
-const debug = require('debug')('Mondb:');
-
+const { dbUrl} = require('./dbConfig');
 const mongoose = require('mongoose');
-
+const debug = require('debug')('Mondb:');
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -13,17 +11,15 @@ require('./models/user');
 require('./models/auth');
 require('./models/game');
 require('./models/league');
+require('./models/box');
 require('./models/boxPurchase');
 require('./models/toPay');
 require('./models/admin');
-require('./models/box');
-require('./models/avatar');
-
 const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
-mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
-//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs', autoIndex: false}).then(() => {
+//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
+mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs0', autoIndex: false, useUnifiedTopology: true}).then(() => {
 
     League.find((err, leagues) => {
         if(err) {
@@ -31,9 +27,9 @@ mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoInd
         }
         if (!err)
             leagues.forEach((item => {
-                mongoose.model(item.spec, scoreboardSchema(item.default_opportunities,item.spec))
+                mongoose.model(item.collectionName, scoreboardSchema(item.defaultopportunities,item.collectionName))
             }));
-        debug('database connected :)')
+        debug('database connected :)');
     });
 
 }).catch((err) => {

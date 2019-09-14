@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const toPaySchema = new Schema({
 
     user: {type: Schema.Types.ObjectId, ref: 'user'},
 
-    coins:{type: Number},
+    amount:{type: Number , required : true , index : true},
 
-    paid: {type: Boolean, deafault : false},
+    paid: {type: Boolean, default : false , index : true},
 
-    transactionId: {type: 'String'}
+    payTime : {type: Date},
+
+    paymentNumber: {type: Number}
 
 }, {
     timestamps: {
@@ -18,4 +21,5 @@ const toPaySchema = new Schema({
     }
     });
 toPaySchema.index({createdAt:1});
+toPaySchema.plugin(AutoIncrement, {inc_field: 'paymentNumber'});
 module.exports = mongoose.model('toPay', toPaySchema);

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const BoxPurchase = mongoose.model('boxPurcahse');
+const BoxPurchase = mongoose.model('boxPurchase');
 const Box = mongoose.model('box');
 const ToPay = mongoose.model('toPay');
 const User = mongoose.model('user');
@@ -7,29 +7,7 @@ const League = mongoose.model('league');
 const debug = require('debug')('dbFunctions:');
 
 
-
 async function surroundingUsers(league, userId, limit) {
-    const Scoreboard = mongoose.model(league);
-    const user = await Scoreboard.findOne({user: userId});
-
-    const [worse, better] = await Promise.all([
-        Scoreboard.find({
-            user: {$ne: userId},
-            $or: [{score: {$lt: user.score}},
-                {$and: [{score: user.score}, {updatedAt: {$gt: user.updatedAt}}]}]
-        }).sort({score: -1, updatedAt: 1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
-
-        Scoreboard.find({
-            user: {$ne: userId},
-            $or: [{score: {$gt: user.score}},
-                {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
-        }).sort({score: 1, updatedAt: -1}).limit(limit).populate({path:'user', select:'username avatar'}).lean(),
-    ]);
-
-    return better.reverse().concat(user).concat(worse);
-}   // doesn't show ranks
-
-async function surroundingUserRanks(league, userId, limit) {
     const Scoreboard = mongoose.model(league);
     const user = await Scoreboard.findOne({user: userId});
     let count = await Scoreboard.find({
@@ -65,31 +43,7 @@ async function surroundingUserRanks(league, userId, limit) {
 
 }
 
-async function edgeUsersRank(league,edge1,edge2) {
-    const Scoreboard = mongoose.model(league);
-    const count = await Scoreboard.find().countDocuments();
-    const sort = {score: -1, updatedAt: 1};
-    const responseInfo  ={};
-    if(edge1 != null && edge1 !== 0 &&  edge1 < count) {
-        responseInfo.edge1User =
-           await Scoreboard.find()
-                .limit(1)
-                .skip(parseInt(edge1) - 1)
-                .sort(sort)
-                .exec();
-    }
-    if(edge2 != null && edge2 !== 0 &&  edge2 < count) {
-        responseInfo.edge2User =
-            await Scoreboard.find()
-                .limit(1)
-                .skip(parseInt(edge2) - 1)
-                .sort(sort)
-                .exec();
-    }
-    return  responseInfo;
-}
-
-function pagingUsers(league, limit, page) {
+function getRecords(league, limit, page) {
      return new Promise((resolve, reject) => {
          const Scoreboard = mongoose.model(league);
          const sort = {score: -1, updatedAt: 1};
@@ -120,7 +74,7 @@ async function userRank(league, userId) {
     return count + 1;
 }
 
-async function exchangeTotalOppoToLeagueOppo(userId, username, oppo, league) {  // transaction 
+async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // transaction
    // let[nr,user]=null;
     const session = await mongoose.startSession();
 
@@ -130,27 +84,26 @@ async function exchangeTotalOppoToLeagueOppo(userId, username, oppo, league) {  
         const opts = {session};
         const Scoreboard = mongoose.model(league.spec);
         const userInfo = await User.findById(userId);
-        if (userInfo && userInfo.opportunities >= oppo) {
+        if (userInfo && userInfo.coupons >= oppo) {
 
             const record = await Scoreboard.findOne({user: userId});
             let newRecord = null;
     
             if (record == null) {
-                if (league.max_opportunities &&  parseInt(oppo) + parseInt(league.default_opportunities) > parseInt(league.max_opportunities)) {
+                if (league.maxopportunities &&  parseInt(oppo) + parseInt(league.dafaultopportunities) > parseInt(league.maxopportunities)) {
                     throw 2; //this is somehow a bad request. client mistake!!!
                 }
                 newRecord = {
                     user: userId,
-                    username: username,
                     played: 0,
                     avatar:userInfo.avatar,
-                    opportunities: league.default_opportunities + oppo,
+                    opportunities: league.defaultopportunities + oppo,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
                 };
             }
             else if (record) {
-                if (league.max_opportunities && parseInt(record.played) + parseInt(oppo) + parseInt(record.opportunities) > parseInt(league.max_opportunities)) {
+                if (league.maxopportunities && parseInt(record.played) + parseInt(oppo) + parseInt(record.opportunities) > parseInt(league.maxopportunities)) {
                     throw 2;  //this is somehow a bad request. client mistake!!!
                 }
     
@@ -159,8 +112,7 @@ async function exchangeTotalOppoToLeagueOppo(userId, username, oppo, league) {  
             }
     
             const newRecordToSave = new Scoreboard(newRecord);
-           let [nr, user] = await Promise.all([newRecordToSave.save(), User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: 0 - oppo}}, {new: true})]);
-          //  [nr, user] = await Promise.all([newRecordToSave.save(opts), User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: 0 - oppo}}, {session,new: true})]);
+            [nr, user] = await Promise.all([newRecordToSave.save(opts), User.findOneAndUpdate({_id: userId}, {$inc: {coupons: 0 - oppo}}, {session,new: true})]);
             await session.commitTransaction();
             session.endSession();
             return {record: nr, user: user};
@@ -176,19 +128,17 @@ async function exchangeTotalOppoToLeagueOppo(userId, username, oppo, league) {  
     }
   }
 
-async function exchangeCoinToMoney(userId,coins) {
+async function exchangecoinsToMoney(userId,coins) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
         const opts = {session};
-        const toPay = new ToPay({user:userId,coins:coins});
+        const toPay = new ToPay({user:userId,amount:coins * coins_PRICE});
         const user = await User.findById(userId);
-        if(user && user.coins < coins) throw 2; // not enough coin
+        if(user && user.coins < coins) throw 2; // not enough coins
         user.coins = user.coins - coins;
-        await user.save();
-        await toPay.save();
-       // await user.save(opts);
-       // await toPay.save(opts);
+        await user.save(opts);
+        await toPay.save(opts);
 
         await session.commitTransaction();
         session.endSession();
@@ -201,29 +151,32 @@ async function exchangeCoinToMoney(userId,coins) {
     }
 }
 
-async function giveAwards(leagueSpec) {
+async function giveRewards(collectionName) {
     const session = await mongoose.startSession();
 
 
     session.startTransaction();
     try {
         const opts = {session};
-        const league = await League.findOne({spec: leagueSpec}).lean();
+        const league = await League.findOne({spec: collectionName}).lean();
         if(!league)
             throw 404;
-        if(league.end_time >= Date.now() || league.rewarded === true)
+        if(league.endTime >= Date.now() || league.rewarded === true)
             throw 400;
-        const coinUsers = await pagingUsers(league.spec,league.leadersNumber,1);
-     //   const loyaltyUsers = await pagingUsers(league.spec,league.loyaltyGivensNumber,1);
-        for (const record of coinUsers) {
+        const coinsUsers = await getRecords(league.spec,league.leadersNumber,1);
+        for (const record of coinsUsers) {
           await  User.findOneAndUpdate({_id: record.user},
-                {$inc: {coins: league.rewardCoinNumber}});
+                {$inc: {coins: league.coinsRewardNumber}},opts);
         }
-        // loyaltyUsers.forEach(record => {
-        //     User.findOneAndUpdate({_id: record.user},
-        //         {$inc: {loyalty:league.rewardLoyaltyNumber}});
-        // });
-        const newLeague = await League.findOneAndUpdate({spec:leagueSpec},{rewarded : true},{new:true});
+        if(league.loyaltiesGivensNumber && league.loyaltiesGivensNumber !== 0) {
+            const loyaltiesUsers = await getRecords(league.spec,league.loyaltiesGivensNumber,1);
+            loyaltiesUsers.forEach(record => {
+                User.findOneAndUpdate({_id: record.user},
+                    {$inc: {loyalties:league.loyaltiesRewardNumber}},opts);
+            });
+        }
+
+        const newLeague = await League.findOneAndUpdate({spec:collectionName},{rewarded : true},{session,new:true});
         await session.commitTransaction();
         session.endSession();
         return newLeague;
@@ -235,7 +188,7 @@ async function giveAwards(leagueSpec) {
     }
 } //admin  remember too add opts fot transactions working
 
-function saveBoxTransaction(userId, username, transactionId, boxId) {
+function saveBoxTransaction(userId, transactionId, boxId) {
     const p = {
         user: userId,
         transactionId: transactionId,
@@ -254,9 +207,9 @@ function saveBoxTransaction(userId, username, transactionId, boxId) {
 
 } // used inside of buyBox
 
-async function buyBox(userId, username, transactionId, boxId) {
+async function buyBox(userId, transactionId, boxId) {
     const box = await Box.findById(boxId);
-    const [user, bt] = Promise.all([User.findOneAndUpdate({_id: userId}, {$inc: {opportunities: box.opportunities}}, {new: true}), saveBoxTransaction(userId, username, transactionId, boxId)]);
+    const [user, bt] = Promise.all([User.findOneAndUpdate({_id: userId}, {$inc: {coupons: box.coupons}}, {new: true}), saveBoxTransaction(userId, transactionId, boxId)]);
     return {user: user, transaction: bt};
 
 }  //not sure how the usage will be. from client or an payment api.
@@ -265,10 +218,8 @@ async function buyBox(userId, username, transactionId, boxId) {
 module.exports = {
     surroundingUsers,
     userRank,
-    surroundingUserRanks,
-    edgeUsersRank,
-    exchangeTotalOppoToLeagueOppo,
-    exchangeCoinToMoney,
+    exchangecouponsToLeagueOppo,
+    exchangecoinsToMoney,
     buyBox,
-    giveAwards
+    giveRewards
 };

@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const boxPurchaseSchema = new Schema({
 
-    user: {type: Schema.Types.ObjectId, ref: 'user'},
+    user: {type: Schema.Types.ObjectId, ref: 'user', index:true},
 
     authority: {type: String},
 
-    amount: {type:Number},
+    amount: {type:Number, required:true},
 
     refId: {type:String},
 
@@ -20,4 +20,7 @@ const boxPurchaseSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('boxPurcahse', boxPurchaseSchema);
+ boxPurchaseSchema.virtual('id').get(function () {
+     return this._id;
+ });
+module.exports = mongoose.model('boxPurchase', boxPurchaseSchema);

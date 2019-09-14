@@ -2,50 +2,48 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const leagueSchema = new Schema({
 
-    name: {type: String, minLength: 3},
+    name: {type: String, minLength: 3 , required : true},
 
-    spec: {type: String,unique:true},
+    collectionName: {type: String,unique:true},
 
     description: {type: String},
 
-    kind: {type: Number},
+    kind: {type: Number , reuired :true},
 
-    leadersNumber: {type :Number,default:0},
+    leadersNumber: {type :Number,default:0 , required : true},
 
-    rewardCoinNumber: {type:Number,default:0},
+    coinsReward: {type:Number,default:0 , required : true},
 
-    loyaltyGivensNumber: {type:Number, default:0},
+    loyaltiesGivens: {type:Number, default:0},
 
-    rewardLoyaltyNumber:{type:Number, default:0},
+    loyaltiesReward:{type:Number, default:0},
 
     rewarded : {type: Boolean, default: false},
 
-    default_opportunities: {type: Number, required : true} ,
+    defaultopportunities: {type: Number, required : true} ,
 
-    max_opportunities: {type: Number},
+    maxopportunities: {type: Number},
 
-    start_time: {type: Date},
+    startTime: {type: Date},
 
-    end_time: {type: Date},
+    endTime: {type: Date},
 
-    available: {type: Boolean, default: false},
+    available: {type: Boolean, default: false}, // available to users
+
+    gameHidden : {type: Boolean, default : false},
 
     images: [{type: String}],
 
     mainImage: {type: String, required: true},
 
-    gif: {type: String},
-
-    game: {type: String},
-
-    html:{type: String},
+    html:{type: String , rqeuired : true},
 
     gameZip : {type :String},
 
-    baseColor : {type: String},
+    color : {type: String},
 
-    secondaryColor : {type: String}
 });
+
 
 // leagueSchema.virtual('id').get(function () {
 //     return this._id;

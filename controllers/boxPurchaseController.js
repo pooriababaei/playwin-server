@@ -5,6 +5,7 @@ const merchantId = fs.readFileSync(path.join(__dirname, '../keys/merchant_key'))
 const ZarinpalCheckout = require('zarinpal-checkout');
 const zarinpal = ZarinpalCheckout.create(merchantId, false);
 const Box = mongoose.model('box');
+const BoxPurchase = mongoose.model('boxPurchase');
 const debug = require('debug')('BoxPurchase Controller:');
 
 function purchaseBox (req,res) {
@@ -49,6 +50,23 @@ function validatePurchase (req, res) {
     }
 }  // must be completed !!!
 
+function totalPurchases (req, res) {
+    BoxPurchase.aggregate([{
+        $group: {
+            _id: null,
+            sum: {
+                $sum: "$amount"
+            }
+        }
+    }],(err,result)=> {
+        if(err) return res.sendStatus(500);
+        if(!result || result.length === 0)
+           return res.status(200).send({sum:0});
+        return res.status(200).send({sum:result[0].sum});
+    });
+} //mush add $match to get just paid purchases
+
+
 module.exports = {
-    purchaseBox, validatePurchase
+    purchaseBox, validatePurchase, totalPurchases
 };

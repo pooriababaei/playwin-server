@@ -1,7 +1,6 @@
 const _ = require('underscore');
 const mongoose = require('mongoose');
 const User = mongoose.model('user');
-const League = mongoose.model('league');
 const debug = require('debug')('User Controller:');
 
 
@@ -57,9 +56,9 @@ async function getUsers(req, res) {
 }
 
 function updateUser (req,res) {
-    const extraOppo = req.query.extraOppo;
+    const extracoupons = req.query.extracoupons;
     const info = _.pick(req.body, 'avatar', 'account');
-    User.findOneAndUpdate({_id:req.userId},{...info,$inc:{opportunities:extraOppo == 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
+    User.findOneAndUpdate({_id:req.userId},{...info,$inc:{coupons:extracoupons == 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
         if(err)
             res.sendStatus(500);
         else if (!user)
@@ -69,6 +68,17 @@ function updateUser (req,res) {
     });
 }
 
+async function usersCount (req, res) {
+    try {
+        let count = await User.find().countDocuments();
+        return res.status(200).send({count: count});
+    }catch (e) {
+        debug(e);
+        res.sendStatus(500);
+    }
+
+}
+
 module.exports = {
-    checkNewVersion, getUser, updateUser,getUsers
+    checkNewVersion, getUser, updateUser,getUsers, usersCount
 };

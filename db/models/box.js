@@ -3,19 +3,18 @@ const Schema = mongoose.Schema;
 
 const boxSchema = new Schema({
 
-    name: {type: String},
+    name: {type: String , required:true},
 
-    price: {type: Number},
+    type:{type : Number},
+
+    price: {type: Number , required:true},
 
     offPrice: {type: Number},
 
-    oppos:{type:Number},
+    coupons:{type:Number},
 
-    loyalties:{type:Number},
+    endTime:{type:Date},
 
-    end_time:{type:Date},
-
-    image: {type:String},
 });
 
 module.exports = mongoose.model('box', boxSchema);

@@ -5,8 +5,9 @@ const currencyController = require('../controllers/currencyController');
 const debug = require('debug')('Currency Route:');
 
 
-router.get('/exchangeTotalOppoToLeagueOppo/:leagueSpec/:opportunities/', isUser, isLeagueUp, currencyController.exchangeTotalOppoToLeagueOppo);
-router.get('/exchangeCoinToMoney/:coins',isUser, currencyController.exchangeCoinToMoney);
-router.get('/rewardLeagueWinners/:leagueSpec', isAdmin, currencyController.giveAwards);
+router.get('/exchangecouponsToLeagueOppo/:collectionName/:opportunities/', isUser, isLeagueUp, currencyController.exchangecouponsToLeagueOppo);
+router.get('/exchangecoinsToMoney/:coins',isUser, currencyController.exchangecoinsToMoney);
+router.get('/rewardLeagueWinners/:collectionName', isAdmin, currencyController.giveRewards);
+
 
 module.exports=router;

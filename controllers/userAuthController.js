@@ -15,8 +15,11 @@ function getAuthCode (req,res) {
     let auth = new Auth(info);
     if ((info.phoneNumber.length === 10 || info.phoneNumber.length === 11) && info.phoneNumber.match("0{0,1}9[0-9]{9}$")) {
         auth.save((err, auth) => {
-            if (err)
+            if (err) {
+                console.log(err);
                 return res.status(400).send();
+
+            }
 
             if (auth) {
                 sendSMS(info.phoneNumber,auth.authToken);//here we should send authToken to auth phone number

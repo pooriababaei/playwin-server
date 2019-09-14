@@ -1,4 +1,4 @@
-const {url, dbUrl, dbName} = require('./db/configDb');
+const {url, dbUrl, dbName} = require('./db/dbConfig');
 const MongoClient = require('mongodb').MongoClient;
 const client = new MongoClient(url, {useNewUrlParser: true});
 //const client = new MongoClient(url, {useNewUrlParser: true,replicaSet: 'rs'});
@@ -33,7 +33,7 @@ mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then((
         }
         if (!err)
             leagues.forEach((item => {
-                mongoose.model(item.spec, scoreboardSchema(item.default_opportunities,item.spec))
+                mongoose.model(item.collectionName, scoreboardSchema(item.dafaultopportunities,item.collectionName))
             }));
         debug('database connected :)')
         f();
