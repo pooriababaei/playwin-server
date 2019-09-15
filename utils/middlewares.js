@@ -162,8 +162,7 @@ const isLeagueUp = function (req, res, next) {
         league = req.query.collectionName;
 
     if (mongoose.modelNames().indexOf(league) > -1) {
-       // debug(mongoose.modelSchemas)
-        League.findOne({spec: league}, (err, league) => {
+        League.findOne({collectionName: league}, (err, league) => {
             if (err)
                 return res.sendStatus(500);
             else if (!league)
@@ -192,7 +191,7 @@ const isLeagueUp = function (req, res, next) {
         league = req.query.collectionName;
 
     if (mongoose.modelNames().indexOf(league) > -1) {
-        League.findOne({spec: league}, (err, league) => {
+        League.findOne({collectionName: league}, (err, league) => {
             if (err)
                 return res.sendStatus(500);
             else if (!league)

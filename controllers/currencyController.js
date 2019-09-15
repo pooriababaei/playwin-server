@@ -13,7 +13,7 @@ function exchangecouponsToLeagueOppo (req, res) {
         if(err === 1 || err === 2)
             return res.status(400).send({code:err});
         res.status(500).send(err.toString());
-    });  //if throws 1 not enough oppo. if throws 2 maxopportunities bound(client mistake). otherwise returns updated user and record
+    });  //if throws 1 not enough oppo. if throws 2 maxOpportunities bound(client mistake). otherwise returns updated user and record
 
 }
 

@@ -41,7 +41,7 @@ function modifyScoreboard (req, res) {
                     }
 
                     else if (result && result.opportunities > 0) {
-                        if (!req.league.maxopportunities || (req.league.maxopportunities && req.league.maxopportunities > result.played)) {
+                        if (!req.league.maxOpportunities || (req.league.maxOpportunities && req.league.maxOpportunities > result.played)) {
                             let newRecord = result;
                             newRecord.opportunities = result.opportunities - 1;
                             newRecord.played = result.played + 1;
@@ -131,13 +131,11 @@ function modifyScoreboard (req, res) {
                                         if (user)
                                             return res.status(200).send(record);
                                     });
-
-
                             });
                         }
 
                         else if (result && result.opportunities > 0 && result.score < score) {
-                            if (!req.league.maxopportunities || (req.league.maxopportunities && req.league.maxopportunities >= result.played)) {
+                            if (!req.league.maxOpportunities || (req.league.maxOpportunities && req.league.maxOpportunities >= result.played)) {
                                 let newRecord = result;
                                 newRecord.score = score;
                                 newRecord.opportunities = result.opportunities - 1;
@@ -176,7 +174,7 @@ function modifyScoreboard (req, res) {
                             username: req.username,
                             played:0,
                             avatar: req.avatar,
-                            opportunities: (req.league.maxopportunities && req.league.maxopportunities < req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO) ? req.league.dafaultopportunities : req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO,
+                            opportunities: (req.league.maxOpportunities && req.league.maxOpportunities < req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO) ? req.league.dafaultopportunities : req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO,
                             createdAt: Date.now(),
                             updatedAt: Date.now()
                         });
@@ -193,7 +191,7 @@ function modifyScoreboard (req, res) {
                                 });
                         });
                     }
-                    else if (!req.league.maxopportunities || result && result.opportunities + result.played + ADVERTISE_AWARD_OPPO <=req.league.maxopportunities) {
+                    else if (!req.league.maxOpportunities || result && result.opportunities + result.played + ADVERTISE_AWARD_OPPO <=req.league.maxOpportunities) {
                         let newRecord = result;
                         newRecord.opportunities = result.opportunities + ADVERTISE_AWARD_OPPO;
                         newRecord.save((err, result1) => {

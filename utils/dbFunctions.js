@@ -82,7 +82,7 @@ async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // transacti
     session.startTransaction();
     try {
         const opts = {session};
-        const Scoreboard = mongoose.model(league.spec);
+        const Scoreboard = mongoose.model(league.collectionName);
         const userInfo = await User.findById(userId);
         if (userInfo && userInfo.coupons >= oppo) {
 
@@ -90,20 +90,20 @@ async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // transacti
             let newRecord = null;
     
             if (record == null) {
-                if (league.maxopportunities &&  parseInt(oppo) + parseInt(league.dafaultopportunities) > parseInt(league.maxopportunities)) {
+                if (league.maxOpportunities &&  parseInt(oppo) + parseInt(league.dafaultopportunities) > parseInt(league.maxOpportunities)) {
                     throw 2; //this is somehow a bad request. client mistake!!!
                 }
                 newRecord = {
                     user: userId,
                     played: 0,
                     avatar:userInfo.avatar,
-                    opportunities: league.defaultopportunities + oppo,
+                    opportunities: league.defaultOpportunities + oppo,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
                 };
             }
             else if (record) {
-                if (league.maxopportunities && parseInt(record.played) + parseInt(oppo) + parseInt(record.opportunities) > parseInt(league.maxopportunities)) {
+                if (league.maxOpportunities && parseInt(record.played) + parseInt(oppo) + parseInt(record.opportunities) > parseInt(league.maxOpportunities)) {
                     throw 2;  //this is somehow a bad request. client mistake!!!
                 }
     
@@ -158,25 +158,25 @@ async function giveRewards(collectionName) {
     session.startTransaction();
     try {
         const opts = {session};
-        const league = await League.findOne({spec: collectionName}).lean();
+        const league = await League.findOne({collectionName: collectionName}).lean();
         if(!league)
             throw 404;
         if(league.endTime >= Date.now() || league.rewarded === true)
             throw 400;
-        const coinsUsers = await getRecords(league.spec,league.leadersNumber,1);
+        const coinsUsers = await getRecords(league.collectionName,league.leadersNumber,1);
         for (const record of coinsUsers) {
           await  User.findOneAndUpdate({_id: record.user},
                 {$inc: {coins: league.coinsRewardNumber}},opts);
         }
         if(league.loyaltiesGivensNumber && league.loyaltiesGivensNumber !== 0) {
-            const loyaltiesUsers = await getRecords(league.spec,league.loyaltiesGivensNumber,1);
+            const loyaltiesUsers = await getRecords(league.collectionName,league.loyaltiesGivensNumber,1);
             loyaltiesUsers.forEach(record => {
                 User.findOneAndUpdate({_id: record.user},
                     {$inc: {loyalties:league.loyaltiesRewardNumber}},opts);
             });
         }
 
-        const newLeague = await League.findOneAndUpdate({spec:collectionName},{rewarded : true},{session,new:true});
+        const newLeague = await League.findOneAndUpdate({collectionName:collectionName},{rewarded : true},{session,new:true});
         await session.commitTransaction();
         session.endSession();
         return newLeague;

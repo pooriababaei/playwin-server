@@ -87,9 +87,9 @@ function createLeague (req,res) {
     let gameZip;
 
     const info = _.pick(req.body, 'name', 'collectionName', 'description', 'startTime', 'kind', 'endTime', 'available',
-        'defaultopportunities', 'maxopportunities','html','baseColor','secondaryColor','leadersNumber',
+        'defaultOpportunities', 'maxOpportunities','html','baseColor','secondaryColor','leadersNumber',
         'loyaltiesGivensNumber','coinsRewardNumber');
-    info.defaultopportunities = info.defaultopportunities - 1;
+    info.defaultOpportunities = info.defaultOpportunities - 1;
 
     if (req.files && req.files.mainImage) {
         mainImage = '/public/leagues/' + req.body.collectionName + '/' + req.files.mainImage[0].filename;
@@ -129,7 +129,7 @@ function createLeague (req,res) {
             debug(err);
             return res.status(400).send();
         }
-        mongoose.model(league.collectionName, scoreboardSchema(league.defaultopportunities, league.collectionName));
+      //  mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
         return res.status(200).send(league);
     });
 }
@@ -142,9 +142,9 @@ function updateLeague (req,res) {
     let gameZip;
 
     const info = _.pick(req.body, 'name', 'collectionName', 'description', 'startTime', 'endTime', 'available',
-        'defaultopportunities', 'maxopportunities','html','baseColor','secondaryColor','leadersNumber',
+        'defaultOpportunities', 'maxOpportunities','html','baseColor','secondaryColor','leadersNumber',
         'loyaltiesGivensNumber','coinsRewardNumber', 'loyaltiesRewardNumber');
-    info.defaultopportunities = info.defaultopportunities - 1;
+    info.defaultOpportunities = info.defaultOpportunities - 1;
 
     if (req.files && req.files.mainImage) {
         mainImage = '/public/leagues/' + req.body.collectionName + '/' + req.files.mainImage[0].filename;

@@ -16,9 +16,8 @@ router.post('/signup', userAuthController.signup);
 router.get('/usersCount',isAdmin, userController.usersCount);
 
 router.get('/',isAdmin,userController.getUsers);
+router.put('/', isUser, userController.updateUser);
 router
     .route('/:id', isUser,userController.getUser)
-    .get(userController.getUser)
-    .put(userController.updateUser);
-
+    .get(userController.getUser);
 module.exports = router;

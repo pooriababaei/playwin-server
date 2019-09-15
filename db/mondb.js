@@ -27,7 +27,7 @@ mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaS
         }
         if (!err)
             leagues.forEach((item => {
-                mongoose.model(item.collectionName, scoreboardSchema(item.defaultopportunities,item.collectionName))
+                mongoose.model(item.collectionName, scoreboardSchema(item.defaultOpportunities,item.collectionName))
             }));
         debug('database connected :)');
     });

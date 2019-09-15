@@ -58,7 +58,7 @@ async function getUsers(req, res) {
 function updateUser (req,res) {
     const extracoupons = req.query.extracoupons;
     const info = _.pick(req.body, 'avatar', 'account');
-    User.findOneAndUpdate({_id:req.userId},{...info,$inc:{coupons:extracoupons == 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
+    User.findOneAndUpdate({_id:req.userId},{...info,$inc:{coupons:extracoupons === 'true'? ADVERTISE_AWARD_OPPO : 0}},{new:true},(err,user)=>{
         if(err)
             res.sendStatus(500);
         else if (!user)

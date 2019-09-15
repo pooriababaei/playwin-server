@@ -20,9 +20,9 @@ const leagueSchema = new Schema({
 
     rewarded : {type: Boolean, default: false},
 
-    defaultopportunities: {type: Number, required : true} ,
+    defaultOpportunities: {type: Number, required : true} ,
 
-    maxopportunities: {type: Number},
+    maxOpportunities: {type: Number},
 
     startTime: {type: Date},
 
