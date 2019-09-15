@@ -5,7 +5,7 @@ const dbFunctions = require('../utils/dbFunctions');
 const debug = require('debug')('Scoreboard Controller:');
 
 function modifyScoreboard (req, res) {
-    let Scoreboard = mongoose.model(req.league.spec);
+    let Scoreboard = mongoose.model(req.league.collectionName);
 
     if (!Scoreboard) return res.sendStatus(400);
 
@@ -277,6 +277,10 @@ async function getRecords (req, res) {
     }).status(200).send(records);
 }
 
+async function leadersAveragePlayed (req, res) {
+    const leaders = getAv
+}
+
 module.exports = {
-    modifyScoreboard, userRank, userRecord, surroundingUsers, pagingUsers: getRecords
+    modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords: getRecords
 };

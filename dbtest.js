@@ -1,7 +1,7 @@
 const {url, dbUrl, dbName} = require('./db/dbConfig');
 const MongoClient = require('mongodb').MongoClient;
-const client = new MongoClient(url, {useNewUrlParser: true});
-//const client = new MongoClient(url, {useNewUrlParser: true,replicaSet: 'rs'});
+//const client = new MongoClient(url, {useNewUrlParser: true});
+const client = new MongoClient(url, {useNewUrlParser: true,replicaSet: 'rs0'});
 const debug = require('debug')('Mondb:');
 
 const mongoose = require('mongoose');
@@ -16,6 +16,8 @@ mongoose.Promise = global.Promise;
 // require('./models/auth');
 // require('./models/game');
  require('./db/models/league');
+require('./db/models/admin');
+
 // require('./models/boxTransaction');
 // require('./models/toPay');
 // require('./models/box');
@@ -36,7 +38,7 @@ mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then((
                 mongoose.model(item.collectionName, scoreboardSchema(item.dafaultopportunities,item.collectionName))
             }));
         debug('database connected :)')
-        f();
+        g();
     });
 
 }).catch((err) => {
@@ -77,6 +79,13 @@ User.find({_id:'5c4b57c8eca18e404443adab'}).then(res=>{
 /*league.save((err, league) => {
     if (!err) debug.log(league);
 });*/
+async function g ()
+{
+
+  var Admin = mongoose.model('admin');
+  const arr = await Admin.find().lean();
+  console.log(arr[0].name === 'Mahdi')
+}
 async function f() {
 
 
