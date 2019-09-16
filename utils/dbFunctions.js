@@ -154,7 +154,6 @@ async function exchangecoinsToMoney(userId,coins) {
 async function giveRewards(collectionName) {
     const session = await mongoose.startSession();
 
-
     session.startTransaction();
     try {
         const opts = {session};
@@ -163,16 +162,16 @@ async function giveRewards(collectionName) {
             throw 404;
         if(league.endTime >= Date.now() || league.rewarded === true)
             throw 400;
-        const coinsUsers = await getRecords(league.collectionName,league.leadersNumber,1);
-        for (const record of coinsUsers) {
+        const coinUsers = await getRecords(league.collectionName,league.leadersNumber,1);
+        for (const record of coinUsers) {
           await  User.findOneAndUpdate({_id: record.user},
-                {$inc: {coins: league.coinsRewardNumber}},opts);
+                {$inc: {coins: league.coinsReward}},opts);
         }
-        if(league.loyaltiesGivensNumber && league.loyaltiesGivensNumber !== 0) {
-            const loyaltiesUsers = await getRecords(league.collectionName,league.loyaltiesGivensNumber,1);
+        if(league.loyaltyGivens && league.loyaltyGivens !== 0) {
+            const loyaltiesUsers = await getRecords(league.collectionName,league.loyaltyGivens,1);
             loyaltiesUsers.forEach(record => {
                 User.findOneAndUpdate({_id: record.user},
-                    {$inc: {loyalties:league.loyaltiesRewardNumber}},opts);
+                    {$inc: {loyalties:league.loyaltiesReward}},opts);
             });
         }
 

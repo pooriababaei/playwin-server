@@ -275,10 +275,6 @@ async function getRecords (req, res) {
     }).status(200).send(records);
 }
 
-async function leadersAveragePlayed (req, res) {
-    const leaders = getAv
-}
-
 module.exports = {
     modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords: getRecords
 };

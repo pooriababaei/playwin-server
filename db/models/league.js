@@ -14,7 +14,7 @@ const leagueSchema = new Schema({
 
     coinsReward: {type:Number,default:0 , required : true},
 
-    loyaltiesGivens: {type:Number, default:0},
+    loyaltyGivens: {type:Number, default:0},
 
     loyaltiesReward:{type:Number, default:0},
 

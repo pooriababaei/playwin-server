@@ -35,10 +35,12 @@ function exchangecoinsToMoney (req, res) {
 }
 
 function giveRewards (req, res) {
+
     const collectionName = req.params.collectionName;
     dbFunctions.giveRewards(collectionName).then(result=> {
         return res.status(200).send(result);
     }).catch(err => {
+        debug(err)
         return res.sendStatus(500);
     });
 }
