@@ -87,25 +87,10 @@ const boxUpload = multer({
     fileFilter: fileFilter
 }).fields([{name: 'image', maxCount: 1}]);
 
-const adminStorage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        const dir = path.join(__dirname, '../public/admins');
-        if (!fs.existsSync(dir))
-            fs.mkdirSync(dir);
-        callback(null, path.join(__dirname, '../public/admins'));
-    },
-    filename: function (req, file, callback) {
-        callback(null, file.originalname);
-    }
-});
-const adminUpload = multer({
-    storage: adminStorage,
-    fileFilter: fileFilter
-}).fields([{name: 'image', maxCount: 1}]);
+
 
 module.exports = {
     gameUpload,
     leagueUpload,
-    boxUpload,
-    adminUpload
+    boxUpload
 };

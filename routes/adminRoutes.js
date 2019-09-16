@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {isAdmin,isSuperAdmin}= require('../utils/middlewares');
-const {adminUpload} = require('../utils/fileUpload');
 const adminController = require('../controllers/adminController');
 const authController = require('../controllers/adminAuthController');
 
 router
     .route('/',isSuperAdmin)
     .get(adminController.getAdmins)
-    .post(adminUpload, adminController.createAdmin);
+    .post(adminController.createAdmin);
 
 router
     .route('/:id', isSuperAdmin)

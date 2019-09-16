@@ -43,7 +43,12 @@ function updatePayment (req, res) {
   });
 }
 
+async function notPaidsNumber(req, res) {
+    const num = await ToPay.find({paid: false}).countDocuments();
+    return res.status(200).send({count:num})
+}
+
 
 module.exports = {
-     getToPays, updatePayment
+     getToPays, updatePayment, notPaidsNumber
 };

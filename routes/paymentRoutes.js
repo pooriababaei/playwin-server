@@ -6,5 +6,6 @@ const debug = require('debug')('Payment Route:');
 
 router.get('/',isAdmin, paymentController.getToPays);
 router.put('/:id',isAdmin, paymentController.updatePayment);
+router.get('/notPaidsNumber', isAdmin, paymentController.notPaidsNumber);
 
 module.exports=router;

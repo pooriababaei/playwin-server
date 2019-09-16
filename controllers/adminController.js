@@ -1,6 +1,7 @@
 const _ = require('underscore');
 const mongoose = require('mongoose');
 const Admin = mongoose.model('admin');
+const bcrypt = require('bcrypt');
 const debug = require('debug')('Admin Controller:');
 
 function getAdmin (req, res) {
@@ -33,6 +34,12 @@ function createAdmin (req, res) {
 
 function updateAdmin (req, res) {
   const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email','role');
+  if (info.password) {
+   let salt= bcrypt.genSaltSync(10);
+     let hash = bcrypt.hashSync(info.password, salt);
+        info.password = hash;
+  }
+  debug(info);
   Admin.findOneAndUpdate({_id:req.params.id},info,{new:true},(err, admin) => {
     if (err)
       return res.status(400).send(err);

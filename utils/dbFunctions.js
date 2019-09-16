@@ -90,7 +90,7 @@ async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // transacti
             let newRecord = null;
     
             if (record == null) {
-                if (league.maxOpportunities &&  parseInt(oppo) + parseInt(league.dafaultopportunities) > parseInt(league.maxOpportunities)) {
+                if (league.maxOpportunities &&  parseInt(oppo) + parseInt(league.dafaultOpportunities) > parseInt(league.maxOpportunities)) {
                     throw 2; //this is somehow a bad request. client mistake!!!
                 }
                 newRecord = {

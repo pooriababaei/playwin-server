@@ -174,7 +174,7 @@ function modifyScoreboard (req, res) {
                             username: req.username,
                             played:0,
                             avatar: req.avatar,
-                            opportunities: (req.league.maxOpportunities && req.league.maxOpportunities < req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO) ? req.league.dafaultopportunities : req.league.dafaultopportunities + ADVERTISE_AWARD_OPPO,
+                            opportunities: (req.league.maxOpportunities && req.league.maxOpportunities < req.league.dafaultOpportunities + ADVERTISE_AWARD_OPPO) ? req.league.dafaultOpportunities : req.league.dafaultOpportunities + ADVERTISE_AWARD_OPPO,
                             createdAt: Date.now(),
                             updatedAt: Date.now()
                         });
@@ -244,7 +244,7 @@ function surroundingUsers (req, res) {
     const league = req.params.collectionName;
     const limit = parseInt(req.params.limit);
 
-    dbFunctions.surroundingUserRanks(league, req.userId, limit).then(page => {
+    dbFunctions.surroundingUsers(league, req.userId, limit).then(page => {
         return res.status(200).json(page);
     }).catch(err => {
         return res.status(500).send(err);
@@ -268,6 +268,7 @@ async function getRecords (req, res) {
                     .limit(limit)
                     .skip(limit * (page - 1))
                     .sort(sort)
+                    .populate({path:'user', select:'username avatar'})
                     .lean();
     return res.set({
         'Access-Control-Expose-Headers': 'x-total-count',
