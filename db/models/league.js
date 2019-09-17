@@ -4,7 +4,7 @@ const leagueSchema = new Schema({
 
     name: {type: String, minLength: 3 , required : true},
 
-    collectionName: {type: String,unique:true},
+    collectionName: {type: String, unique:true},
 
     description: {type: String},
 

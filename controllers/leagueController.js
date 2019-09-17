@@ -129,7 +129,7 @@ function createLeague (req,res) {
             debug(err);
             return res.status(400).send();
         }
-      //  mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
+        mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
         return res.status(200).send(league);
     });
 }
