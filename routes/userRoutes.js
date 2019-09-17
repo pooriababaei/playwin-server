@@ -1,6 +1,5 @@
 let express = require('express');
 const path = require('path');
-const resize= require('../utils/resize');
 let router = express.Router();
 const {isUser,isUserOrAdmin, isAdmin} = require('../utils/middlewares');
 const userAuthController = require('../controllers/userAuthController');
