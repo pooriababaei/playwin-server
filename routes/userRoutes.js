@@ -19,4 +19,5 @@ router.put('/', isUser, userController.updateUser);
 router
     .route('/:id', isUser,userController.getUser)
     .get(userController.getUser);
+
 module.exports = router;

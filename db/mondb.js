@@ -5,6 +5,7 @@ const debug = require('debug')('Mondb:');
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
+//mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 
 require('./models/user');
@@ -19,7 +20,7 @@ const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
 //mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
-mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs0', autoIndex: false, useUnifiedTopology: true}).then(() => {
+mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs0', useUnifiedTopology: true}).then(() => {
 
     League.find((err, leagues) => {
         if(err) {
