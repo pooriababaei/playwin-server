@@ -36,7 +36,7 @@ const leagueSchema = new Schema({
 
     mainImage: {type: String, required: true},
 
-    html:{type: String},
+    html:{type: String, default: '/index.html'},
 
     gameZip : {type :String},
 
