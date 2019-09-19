@@ -87,7 +87,7 @@ function createLeague (req,res) {
     let gameZip;
 
     const info = _.pick(req.body, 'name', 'collectionName', 'description', 'startTime', 'kind', 'endTime', 'available',
-        'defaultOpportunities', 'maxOpportunities','html','baseColor','leadersNumber',
+        'defaultOpportunities', 'maxOpportunities','html','color','leadersNumber',
         'loyaltyGivens','coinsReward', 'loyaltiesReward');
     info.defaultOpportunities = info.defaultOpportunities - 1;
 
@@ -142,7 +142,7 @@ function updateLeague (req,res) {
     let gameZip;
 
     const info = _.pick(req.body, 'name', 'collectionName', 'description', 'startTime', 'endTime', 'available',
-        'defaultOpportunities', 'maxOpportunities','html','baseColor','secondaryColor','leadersNumber',
+        'defaultOpportunities', 'maxOpportunities','html','color','secondaryColor','leadersNumber',
         'loyaltyGivens','coinsReward', 'loyaltiesReward');
     info.defaultOpportunities = info.defaultOpportunities - 1;
 
