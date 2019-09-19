@@ -8,7 +8,7 @@ const leagueSchema = new Schema({
 
     description: {type: String},
 
-    kind: {type: Number , reuired :true},
+    kind: {type: Number , required :true},
 
     leadersNumber: {type :Number,default:0 , required : true},
 
