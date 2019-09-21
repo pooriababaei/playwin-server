@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true,parameterLimit: 1000000}));
 app.use(cookieParser());
-app.use('^\\/.+\\.(html|zip)$',isUserOrAdmin);
+app.use(/^.+\.(html|zip)$/,isUserOrAdmin);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/ftp', express.static('public'), serve('public', {'icons': true}));
 
