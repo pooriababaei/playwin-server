@@ -10,10 +10,10 @@ router
     .post(adminController.createAdmin);
 
 router
-    .route('/:id', isSuperAdmin)
-    .get(adminController.getAdmin)
-    .put(adminController.updateAdmin)
-    .delete(adminController.deleteAdmin);
+    .route('/:id')
+    .get(isSuperAdmin, adminController.getAdmin)
+    .put(isSuperAdmin, adminController.updateAdmin)
+    .delete(isSuperAdmin, adminController.deleteAdmin);
 
 router.post('/login',authController.login);
 router.get('/forgotPassword/:email',authController.forgotPassword);
