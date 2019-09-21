@@ -17,7 +17,7 @@ router.get('/usersCount',isAdmin, userController.usersCount);
 router.get('/',isAdmin,userController.getUsers);
 router.put('/', isUser, userController.updateUser);
 router
-    .route('/:id')
-    .get(isUserOrAdmin,userController.getUser);
+    .route(isUserOrAdmin,'/:id')
+    .get(userController.getUser);
 
 module.exports = router;
