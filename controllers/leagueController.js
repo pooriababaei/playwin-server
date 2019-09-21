@@ -113,6 +113,9 @@ function createLeague (req,res) {
 
         info.game = game;
         info.gameZip = gameZip;
+
+        console.log(req)
+
     }
 
     if (req.files && req.files.images) {
@@ -163,9 +166,10 @@ function updateLeague (req,res) {
                     debug(err);
             });
 
-        game = urljoin('/public/leagues', req.body.collectionName , req.files.game[0].originalname.split('.')[0] , info.html);
-        gameZip = urljoin('/public/leagues', req.body.collectionName , req.files.game[0].originalname);
+        const index = info.html ? info.html : 'index.html';
 
+        game = urljoin('/public/leagues', req.body.collectionName , req.files.game[0].originalname.split('.')[0] , index);
+        gameZip = urljoin('/public/leagues', req.body.collectionName , req.files.game[0].originalname);
         info.game = game;
         info.gameZip = gameZip;
     }

@@ -28,6 +28,8 @@ const leagueSchema = new Schema({
 
     endTime: {type: Date},
 
+    game:{type: String},
+
     available: {type: Boolean, default: false}, // available to users
 
     gameHidden : {type: Boolean, default : false},
