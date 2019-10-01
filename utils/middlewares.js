@@ -129,10 +129,16 @@ const isUserOrAdmin = function (req, res, next) {
 };
 
 const isApp = function (req, res, next) {
+    try{
     if(req.headers['content-size'] == null)
         return res.sendStatus(401);
-
-    const bytes  = CryptoJS.AES.decrypt(req.headers['content-size'], app_key);
+        let phone = null; 
+        if(req.phoneNumber)
+        phone = req.phoneNumber;
+        else if (req.params.phone)
+        phone = req.params.phone;
+        else return res.sendStatus(401);
+        const bytes  = CryptoJS.AES.decrypt(req.headers['content-size'], app_key + phone);
         if(bytes.toString() !== "") {
             const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             if(decryptedData.score)
@@ -141,6 +147,9 @@ const isApp = function (req, res, next) {
         }
         else
             return res.sendStatus(401);
+    }catch(err) {
+        return res.sendStatus(401);
+    }
 };
 
 const isLeagueUp = function (req, res, next) {
