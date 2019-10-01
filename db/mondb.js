@@ -20,7 +20,7 @@ const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
 //mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
-mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000,replicaSet: 'rs0',user:'admin',pass:'Playwin@2019',auth:{authSource:'admin'}, useUnifiedTopology: true}).then(() => {
+mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, useUnifiedTopology: true , user: 'admin', pass: 'Playwin@2019', auth:{authSource:'admin'}}).then(() => {
 
     League.find((err, leagues) => {
         if(err) {
