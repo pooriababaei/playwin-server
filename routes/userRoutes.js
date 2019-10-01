@@ -1,17 +1,16 @@
 let express = require('express');
-const path = require('path');
 let router = express.Router();
-const {isUser,isUserOrAdmin, isAdmin} = require('../utils/middlewares');
+const {isUser,isUserOrAdmin, isAdmin,isApp} = require('../utils/middlewares');
 const userAuthController = require('../controllers/userAuthController');
 const userController = require('../controllers/userController');
 const debug = require('debug')('User Route:');
 
 
-router.get('/checkNewVersion/:version', userController.checkNewVersion);
-router.get('/getAuthCode/:phone',userAuthController.getAuthCode);
-router.get('/auth/:phone/:token', userAuthController.auth);
+router.get('/checkNewVersion/:version',isUser, userController.checkNewVersion);
+router.get('/getAuthCode/:phone',isApp,userAuthController.getAuthCode);
+router.get('/auth/:phone/:token',isApp, userAuthController.auth);
 router.get('/checkUniqueUsername/:username',userAuthController.checkUniqueUsername);
-router.post('/signup', userAuthController.signup);
+router.post('/signup',isApp, userAuthController.signup);
 router.get('/usersCount',isAdmin, userController.usersCount);
 
 router.get('/',isAdmin,userController.getUsers);

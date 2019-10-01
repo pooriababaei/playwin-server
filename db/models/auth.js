@@ -34,7 +34,7 @@ authSchema.statics.authenticate = function (phoneNumber, authToken) {
 
 authSchema.pre('save', function (next) {
     let user = this;
-    user.authToken = Math.floor(Math.random() * (999999 - 100000) + 100000);
+    user.authToken = Math.floor(Math.random() * (99999 - 10000) + 10000);
     next();
 });
 

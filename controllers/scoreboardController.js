@@ -64,8 +64,8 @@ function modifyScoreboard (req, res) {
                 });
                 break;
             case 2 :  // make score
-                if (req.query.hasOwnProperty('score')) {
-                    const score = req.query.score;
+                if (req.score) {
+                    const score = req.score;
                     Scoreboard.findOne({user: req.userId}, (err, result) => {
                             if (err)
                                 return res.status(500).send();
@@ -105,8 +105,8 @@ function modifyScoreboard (req, res) {
                 break;
 
             case 3 :  // reduce and make score for leagues that opprtunity is new record NOT playing
-                if (req.query.hasOwnProperty('score')) {
-                    const score = req.query.score;
+                if (req.score) {
+                    const score = req.score;
                     Scoreboard.findOne({user: req.userId}, (err, result) => {
                         if (err)
                             return res.sendStatus(500);
@@ -205,7 +205,7 @@ function modifyScoreboard (req, res) {
                     }
                     else return res.sendStatus(400);
                 });
-                break; //add oppo because for watching advertisement
+                break; //add oppo because of watching advertisement
         }
 
     }
