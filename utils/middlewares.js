@@ -132,7 +132,7 @@ const isApp = function (req, res, next) {
     if(req.headers['content-size'] == null)
         return res.sendStatus(401);
 
-    const bytes  = CryptoJS.AES.decrypt(token, app_key);
+    const bytes  = CryptoJS.AES.decrypt(req.headers['content-size'], app_key);
         if(bytes.toString() !== "") {
             const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             if(decryptedData.score)
