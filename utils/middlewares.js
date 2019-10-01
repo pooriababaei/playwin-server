@@ -129,7 +129,7 @@ const isUserOrAdmin = function (req, res, next) {
 };
 
 const isApp = function (req, res, next) {
-    if(req.headers.contentSize == null)
+    if(req.headers['content-size'] == null)
         return res.sendStatus(401);
 
     const bytes  = CryptoJS.AES.decrypt(token, app_key);
