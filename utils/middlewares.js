@@ -132,7 +132,7 @@ const isApp = function (req, res, next) {
     try{
     if(req.headers['content-size'] == null)
         return res.sendStatus(401);
-        let phone = null; 
+    let phone = null; 
     if(req.phoneNumber)
         phone = req.phoneNumber;
     else if (req.params.phone)
