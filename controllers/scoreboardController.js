@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('user');
+const WeeklyLeader = mongoose.model('weeklyLeader');
+
 
 const dbFunctions = require('../utils/dbFunctions');
 const debug = require('debug')('Scoreboard Controller:');
@@ -276,6 +278,40 @@ async function getRecords (req, res) {
     }).status(200).send(records);
 }
 
+async function weeklyLeaders (req, res) {
+    var pipeline = [ 
+        {
+            $group:{
+                "_id" : "$user",
+                "weeklyCoins": { 
+                    "$sum": "$coins" 
+                } 
+            }
+        },
+        { $sort: { "weeklyCoins": -1 } },
+        { $limit: 100 },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: '_id',
+                foreignField: '_id',
+                as: 'user'
+            }
+        },
+        { $project: {_id: 0, username: "$user.username", weeklyCoins:1, avatar: "$user.avatar" } }
+    ];
+    
+    WeeklyLeader.aggregate(pipeline)
+          .exec(function (err, result){
+              if(err){
+                  console.log(err);
+                  return res.sendStatus(500);
+              }
+              console.log(result);
+              res.json(result);
+        });
+}
+
 module.exports = {
-    modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords: getRecords
+    modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords: getRecords, weeklyLeaders: weeklyLeaders
 };

@@ -9,13 +9,14 @@ mongoose.set('useCreateIndex', true);
 mongoose.Promise = global.Promise;
 
 require('./models/user');
+require('./models/admin');
 require('./models/auth');
 require('./models/game');
 require('./models/league');
 require('./models/box');
 require('./models/boxPurchase');
 require('./models/toPay');
-require('./models/admin');
+require('./models/weeklyLeader');
 const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 

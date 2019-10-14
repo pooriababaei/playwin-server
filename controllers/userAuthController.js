@@ -9,7 +9,7 @@ const debug = require('debug')('UserAuth Controller:');
 
 function getAuthCode (req,res) {
     const info = {
-        phoneNumber: req.params.phone
+        phoneNumber: req.params.phoneNumber
     };
 
     let auth = new Auth(info);
@@ -34,7 +34,7 @@ function getAuthCode (req,res) {
 function auth (req,res){
     Auth.authenticate(req.params.phone, req.params.token).then((userAuth) => {
         if (userAuth) {
-            User.findOne({phoneNumber: req.params.phone}, (err, user) => {
+            User.findOne({phoneNumber: req.params.phoneNumber}, (err, user) => {
                 if (err) return res.sendStatus(500);
                 if (user) {     // user exists.
                     const token = user.generateToken();

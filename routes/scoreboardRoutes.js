@@ -9,6 +9,7 @@ router.get('/modifyScoreboard/:collectionName/:type',isUser, isApp, isLeagueUp, 
 router.get('/userRecord/:collectionName',isUser,scoreboardController.userRecord);
 router.get('/userRank/:collectionName', isUser, scoreboardController.userRank);
 router.get('/surroundingUsers/:collectionName/:limit', isUser, scoreboardController.surroundingUsers);
+router.get('/weeklyLeaders',isUserOrAdmin,scoreboardController.weeklyLeaders);
 
 
 module.exports=router;

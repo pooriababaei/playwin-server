@@ -12,6 +12,8 @@ const userSchema = new Schema({
 
     coins: {type: Number, default: 0, index : true},
 
+    totalCoins:{type: Number, default: 0, index: true},
+
     coupons: {type: Number, default: 100},
 
     participatedLeagues: [{type: Schema.Types.ObjectId, ref: 'league'}],

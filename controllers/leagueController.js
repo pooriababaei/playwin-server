@@ -22,14 +22,14 @@ async function getLeagues (req,res) {
         filter = JSON.parse(req.query.filter);
 
     if (filter && filter.running) {
-        if (filter.running === 1) {  // up leagues
+        if (filter.running == 1) {  // up leagues
             leagueState.endTime = {$gte: Date.now()};
             leagueState.startTime = {$lte: Date.now()};
         }
-        else if (filter.running === 2) {  //future leagues
+        else if (filter.running == 2) {  //future leagues
             leagueState.startTime = {$gt: Date.now()};
         }
-        else if (filter.running === 3) {  //past leagues
+        else if (filter.running == 3) {  //past leagues
             leagueState.endTime = {$lt: Date.now()};
         }
     }
@@ -45,6 +45,7 @@ async function getLeagues (req,res) {
    const leagues = await query.lean();
         if (!leagues)
             return res.sendStatus(404);
+        
         for(const league of leagues) {
            if(league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
                const Scoreboard = mongoose.model(league.collectionName);
@@ -68,14 +69,25 @@ async function getLeagues (req,res) {
 
 }
 
-function getLeague (req,res) {
-    League.findById(req.params.id, (err, league) => {
-        if (err)
-            return res.sendStatus(500);
+async function getLeague (req,res) {
+    const league = await League.findById(req.params.id).lean();
         if (!league)
             return res.sendStatus(404);
+
+        if(league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
+            const Scoreboard = mongoose.model(league.collectionName);
+            league.playersNumber = await Scoreboard.find().countDocuments();
+            const leadersPlayedTimes = await Scoreboard.find({}, 'played')
+                .limit(league.leadersNumber)
+                .skip(0)
+                .sort({score: -1, updatedAt: 1})
+                .lean();
+            let sum = 0;
+            for (const record of leadersPlayedTimes)
+                sum +=  record.played;
+            league.leadersAveragePlayedTimes = sum / league.leadersNumber;
+        }
         return res.status(200).json(league);
-    });
 
 }
 
