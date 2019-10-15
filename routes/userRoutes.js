@@ -7,8 +7,8 @@ const debug = require('debug')('User Route:');
 
 
 router.get('/checkNewVersion/:version',isUser, userController.checkNewVersion);
-router.get('/getAuthCode/:phone',isApp,userAuthController.getAuthCode);
-router.get('/auth/:phone/:token',isApp, userAuthController.auth);
+router.get('/getAuthCode/:phoneNumber',isApp,userAuthController.getAuthCode);
+router.get('/auth/:phoneNumber/:token',isApp, userAuthController.auth);
 router.get('/checkUniqueUsername/:username',userAuthController.checkUniqueUsername);
 router.post('/signup',isApp, userAuthController.signup);
 router.get('/usersCount',isAdmin, userController.usersCount);
