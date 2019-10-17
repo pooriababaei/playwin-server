@@ -13,16 +13,23 @@ debug(token);*/
 // const s = null ;
 // console.log(s? 1: 5);
 
-var CryptoJS = require("crypto-js");
+// var CryptoJS = require("crypto-js");
 
-var data = "52"
+// var data = "52"
 
-// Encrypt
-var ciphertext = CryptoJS.AES.encrypt(data, 's');
-console.log(ciphertext.toString())
-// Decrypt
-var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret key 123');
-console.log(bytes.toString() === "")
+// // Encrypt
+// var ciphertext = CryptoJS.AES.encrypt(data, 's');
+// console.log(ciphertext.toString())
+// // Decrypt
+// var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret key 123');
+// console.log(bytes.toString() === "")
 //var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
 //console.log(decryptedData.sdf == null);
+// const schedule = require('node-schedule');
+// var t = new Date();
+// t.setSeconds(t.getSeconds() + 10);
+
+// var j = schedule.scheduleJob('* * * * * *',  function(){
+//     console.log('hello')
+// });

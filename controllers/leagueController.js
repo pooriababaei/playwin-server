@@ -113,9 +113,6 @@ function createLeague (req,res) {
 
         info.game = game;
         info.gameZip = gameZip;
-
-        console.log(req)
-
     }
 
     if (req.files && req.files.images) {
@@ -133,6 +130,12 @@ function createLeague (req,res) {
             return res.status(400).send();
         }
         mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
+        if(league.rewarded == false) {
+            var j = schedule.scheduleJob(league.endTime, async function(){
+                const newLeague = await giveRewards(league.collectionName);
+                debug(newLeague.rewarded);
+            });
+        }
         return res.status(200).send(league);
     });
 }
@@ -145,7 +148,7 @@ function updateLeague (req,res) {
     let gameZip;
 
     const info = _.pick(req.body, 'name', 'collectionName', 'description', 'startTime', 'endTime', 'available',
-        'defaultOpportunities', 'maxOpportunities','html','color','secondaryColor','leadersNumber',
+        'defaultOpportunities', 'maxOpportunities','html','color','leadersNumber',
         'loyaltyGivens','coinsReward', 'loyaltiesReward');
     info.defaultOpportunities = info.defaultOpportunities - 1;
 
@@ -190,6 +193,8 @@ function updateLeague (req,res) {
         }
         else if (!league)
             return res.sendStatus(404);
+        
+        if(info.endTime) {}
         return res.status(200).send(league);
     })
 }
