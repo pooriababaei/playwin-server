@@ -17,6 +17,7 @@ require('./models/box');
 require('./models/boxPurchase');
 require('./models/toPay');
 require('./models/weeklyLeader');
+require('./models/job');
 const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
