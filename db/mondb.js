@@ -21,8 +21,8 @@ require('./models/job');
 const League = mongoose.model('league');
 const scoreboardSchema = require('./models/scoreboard');
 
-//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, autoIndex: false}).then(() => {
-mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, useUnifiedTopology: true , replset: 'rs0', user: 'admin', pass: 'Playwin@2019', auth:{authSource:'admin'}}).then(() => {
+//mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, useUnifiedTopology: true}).then(() => {
+mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, useUnifiedTopology: true , replicaSet: 'rs0', user: 'admin', pass: 'Playwin@2019', auth:{authSource:'admin'}}).then(() => {
 
     League.find((err, leagues) => {
         if(err) {

@@ -4,6 +4,7 @@ const Box = mongoose.model('box');
 const ToPay = mongoose.model('toPay');
 const User = mongoose.model('user');
 const League = mongoose.model('league');
+const WeeklyLeader = mongoose.model('weeklyLeader');
 const debug = require('debug')('dbFunctions:');
 
 
@@ -164,8 +165,13 @@ async function giveRewards(collectionName) {
             throw 400;
         const coinUsers = await getRecords(league.collectionName,league.leadersNumber,1);
         for (const record of coinUsers) {
-          await  User.findOneAndUpdate({_id: record.user},
-                {$inc: {coins: league.coinsReward}},opts);
+            await User.findOneAndUpdate({_id: record.user},
+                {$inc: {coins: league.coinsReward, totalCoins: league.coinsReward}},opts);
+            const wl = new WeeklyLeader({
+                user: record.user,
+                coins: league.coinsReward
+            });
+            await wl.save(); // not so important to impact transaction
         }
         if(league.loyaltyGivens && league.loyaltyGivens !== 0) {
             const loyaltiesUsers = await getRecords(league.collectionName,league.loyaltyGivens,1);

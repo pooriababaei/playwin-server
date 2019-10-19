@@ -39,6 +39,7 @@
     "rate-limit-redis": "^1.6.0",
     "rimraf": "^2.6.3",
     "rotating-file-stream": "^1.4.1",
+    "saslprep": "^1.0.3",
     "serve-index": "^1.9.1",
     "underscore": "^1.9.1",
     "url-join": "^4.0.0",

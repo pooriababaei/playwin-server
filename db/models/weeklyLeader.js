@@ -11,4 +11,4 @@ const weeklyLeaderSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('user', weeklyLeaderSchema);
+module.exports = mongoose.model('weeklyLeader', weeklyLeaderSchema);
