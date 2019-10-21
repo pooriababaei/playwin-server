@@ -266,10 +266,8 @@ async function deleteLeague (req,res) {
                 if(!err) delete mongoose.connection.models[league.collectionName];
             });
             rimraf.sync(path.join(__dirname, '../public/leagues', league.collectionName));
-            Job.deleteOne({property:league.collectionName, type:'reward'},(err,res)=> {
-                if(err)
-                console.log(err);
-            });
+            Job.deleteOne({property:league.collectionName, type:'reward'}).exec();
+            schedule.cancelJob(league.collectionName);
             return res.status(200).send({data:league});
         }
         else return res.sendStatus(404);

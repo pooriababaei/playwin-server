@@ -135,8 +135,8 @@ const isApp = function (req, res, next) {
     let phone = null; 
     if(req.phoneNumber)
         phone = req.phoneNumber;
-    else if (req.params.phone)
-        phone = req.params.phone;
+    else if (req.params.phoneNumber)
+        phone = req.params.phoneNumber;
     else return res.sendStatus(401);
     const bytes  = CryptoJS.AES.decrypt(req.headers['content-size'], app_key + phone);
     if(bytes.toString() !== "") {
