@@ -17,7 +17,7 @@ initiateGiveRewardCronForAllLeagues();
     await Job.deleteMany({}).exec();
 
     for (let league of leagues) {
-        if(league.rewarded == false && league.endTime > Date.now()) {
+        if(league.rewarded === false && new Date(league.endTime).getTime() > Date.now()) {
             var job = new Job({
                 type:'reward',
                 property: league.collectionName,

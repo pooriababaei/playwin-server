@@ -225,7 +225,7 @@ async function updateLeague (req,res) {
                 processOwner:process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null };
                 Job.findOneAndUpdate(
                 {property:league.collectionName, type:'reward'},job,(err,dbJob)=> {
-                    if(err) console.log(err);
+                    if(err) debug(err);
                     if(dbJob && !err) {
                         if(!dbJob.processOwner || dbJob.processOwner === process.env.NODE_APP_INSTANCE) {
                             schedule.rescheduleJob(league.collectionName,league.endTime);
