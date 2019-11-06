@@ -281,7 +281,7 @@ async function getRecords (req, res) {
 }
 
 async function weeklyLeaders (req, res) {
-    var pipeline = [ 
+    var pipeline = [
         {
             $group:{
                 "_id" : "$user",
@@ -306,11 +306,10 @@ async function weeklyLeaders (req, res) {
     WeeklyLeader.aggregate(pipeline)
           .exec(function (err, result){
               if(err){
-                  console.log(err);
+                  debug(err);
                   return res.sendStatus(500);
               }
-              console.log(result);
-              res.json(result);
+              res.status(200).json(result);
         });
 }
 
