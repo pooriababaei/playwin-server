@@ -68,17 +68,33 @@ function updateUser (req,res) {  // need to be checked
     });
 }
 
-async function usersCount (req, res) {
-    try {
-        let count = await User.find().countDocuments();
-        return res.status(200).send({count: count});
-    }catch (e) {
-        debug(e);
-        res.sendStatus(500);
-    }
+function usersCount (req, res) {
+        User.find().countDocuments().then(c=> {
+            return res.status(200).send({count: c});
+        }).catch(e=>{
+            debug(e);
+            res.sendStatus(500);
+        }) 
+       
+}
 
+function introduceInviter(req,res) {
+    const inviterUsername = req.params.inviter;
+    if(inviterUsername && typeof inviterUsername === 'string') {
+        if(req.username === inviterUsername)
+            return res.sendStatus(400);
+        User.findOneAndUpdate({username:inviterUsername},{$push: {invitingUsers:req.userId}}).then((user)=> {
+            if(user)
+                return res.sendStatus(200);
+            return res.sendStatus(404);
+        }).catch(()=> {
+            return res.sendStatus(500);
+        })
+    }
+    else
+        return res.sendStatus(400);
 }
 
 module.exports = {
-    checkNewVersion, getUser, updateUser,getUsers, usersCount
+    checkNewVersion, getUser, updateUser,getUsers, usersCount, introduceInviter
 };

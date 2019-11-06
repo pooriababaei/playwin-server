@@ -82,7 +82,7 @@ async function signup (req,res) {
         else if (user) {
             if (req.body.invitedBy && req.body.invitedBy !== info.username && req.body.invitedBy.length > 0) {
                 User.findOneAndUpdate({username: req.body.invitedBy}, {
-                    $inc: {opportunities: 20},
+                    $inc: {coupons: INVITE_REWARD},
                     $push: {invitingUsers: user._id}
                 }, {new: true}, function (err, invitingUser) {
                     if (err) debug(err);

@@ -24,7 +24,7 @@ const leagueSchema = new Schema({
 
     maxOpportunities: {type: Number},
 
-    startTime: {type: Date},
+    startTime: {type: Date, required:true, required:true},
 
     endTime: {type: Date},
 

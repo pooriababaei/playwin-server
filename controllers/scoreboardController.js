@@ -249,7 +249,9 @@ function surroundingUsers (req, res) {
     dbFunctions.surroundingUsers(league, req.userId, limit).then(page => {
         return res.status(200).json(page);
     }).catch(err => {
-        return res.status(500).send(err);
+        if(err == 400)
+            return res.sendStatus(400);
+        return res.sendStatus(500);
     })
 }
 
@@ -313,5 +315,5 @@ async function weeklyLeaders (req, res) {
 }
 
 module.exports = {
-    modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords: getRecords, weeklyLeaders: weeklyLeaders
+    modifyScoreboard, userRank, userRecord, surroundingUsers, getRecords, weeklyLeaders
 };

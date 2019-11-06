@@ -208,7 +208,7 @@ async function updateLeague (req,res) {
     if(league && info.endTime) {
         const oldEndTime = new Date(league.endTime).getTime();
         const newEndTime = new Date(info.endTime);
-        if(oldEndTime === newEndTime || league.rewarded === true)
+        if(oldEndTime === newEndTime || league.rewarded === true || league.endTime < Date.now())
             shouldSchedule = false;
     }
     League.findOneAndUpdate({_id: req.params.id}, info, {new: true}, (err, league) => {

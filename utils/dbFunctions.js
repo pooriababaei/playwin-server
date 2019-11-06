@@ -11,6 +11,8 @@ const debug = require('debug')('dbFunctions:');
 async function surroundingUsers(league, userId, limit) {
     const Scoreboard = mongoose.model(league);
     const user = await Scoreboard.findOne({user: userId});
+    console.log(!user)
+    if(!user) throw 400;
     let count = await Scoreboard.find({
         $or: [{score: {$gt: user.score}},
             {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
@@ -171,7 +173,7 @@ async function giveRewards(collectionName) {
                 user: record.user,
                 coins: league.coinsReward
             });
-            await wl.save(); // not so important to impact transaction
+            await wl.save().catch(e=>{}); // not so important to impact transaction
         }
         if(league.loyaltyGivens && league.loyaltyGivens !== 0) {
             const loyaltiesUsers = await getRecords(league.collectionName,league.loyaltyGivens,1);
