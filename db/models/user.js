@@ -16,6 +16,8 @@ const userSchema = new Schema({
 
     coupons: {type: Number, default: 100},
 
+    achievements: [{type: Schema.Types.ObjectId, ref : 'achievement'}],
+
     participatedLeagues: [{type: Schema.Types.ObjectId, ref: 'league'}],
 
     phoneNumber: {type: String, required: true, unique: true , index: true},
