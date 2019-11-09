@@ -32,7 +32,7 @@ function getAuthCode (req,res) {
 }
 
 function auth (req,res){
-    Auth.authenticate(req.params.phone, req.params.token).then((userAuth) => {
+    Auth.authenticate(req.params.phoneNumber, req.params.token).then((userAuth) => {
         if (userAuth) {
             User.findOne({phoneNumber: req.params.phoneNumber}, (err, user) => {
                 if (err) return res.sendStatus(500);
@@ -45,8 +45,9 @@ function auth (req,res){
                 }
             });
         }
-        else
+        else {
             res.sendStatus(400);
+        }
     }).catch(err => {
         res.status(500).send(err);
     })

@@ -25,9 +25,9 @@ authSchema.statics.authenticate = function (phoneNumber, authToken) {
             if (err) debug('err');
             if (res)
                 return Promise.resolve(res);
-
-            else if (!res)
+            else if (!res){
                 return Promise.resolve();
+            }
 
         });
 };

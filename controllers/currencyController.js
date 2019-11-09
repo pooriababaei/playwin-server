@@ -1,7 +1,6 @@
 const dbFunctions = require('../utils/dbFunctions');
 const mongoose = require('mongoose');
 const ToPay = mongoose.model('toPay');
-const _ = require('underscore');
 const User = mongoose.model('user');
 const Achievement = mongoose.model('achievement');
 const debug = require('debug')('Currency Controller:');
