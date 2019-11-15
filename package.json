@@ -1,9 +1,12 @@
 {
   "name": "playwin",
   "version": "0.0.0",
+  "main": "./src/bin/www.ts",
   "private": true,
   "scripts": {
-    "start": "set debug=*: & node ./bin/www"
+    "start": "set debug=*: & nodemon",
+    "start-js": "set debug=*: & tsc && node -r source-map-support/register ./dist/bin/www.js",
+    "deploy": "tsc && pm2 start ./dist/bin/www.js -i 2"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
@@ -16,12 +19,14 @@
     "crypto-js": "^3.1.9-1",
     "crypto-random-string": "^3.0.1",
     "debug": "^2.6.9",
+    "dotenv": "^8.2.0",
     "express": "~4.16.0",
     "express-rate-limit": "^5.0.0",
     "extract-zip": "^1.6.7",
     "fetch": "^1.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "0.0.1-security",
+    "js-to-ts-converter": "^0.16.3",
     "jsonwebtoken": "^8.3.0",
     "kavenegar": "^1.1.4",
     "moment": "^2.23.0",
@@ -37,7 +42,7 @@
     "persian-date": "^1.0.5",
     "pm2": "^3.5.1",
     "rate-limit-redis": "^1.6.0",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "rotating-file-stream": "^1.4.1",
     "saslprep": "^1.0.3",
     "serve-index": "^1.9.1",
@@ -47,6 +52,9 @@
     "zarinpal-checkout": "^0.2.7"
   },
   "devDependencies": {
-    "eslint": "^6.0.1"
+    "@types/express": "^4.17.2",
+    "@types/node": "^12.12.7",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
   }
 }
