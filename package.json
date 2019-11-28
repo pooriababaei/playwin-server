@@ -7,7 +7,7 @@
     "start": "set debug=*: & nodemon",
     "start-js": "set debug=*: & tsc && node -r source-map-support/register ./dist/bin/www.js",
     "deploy": "tsc && pm2 start ./dist/bin/www.js -i 2",
-    "compile": "tsc"
+    "reload": "tsc && pm2 reload www"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
