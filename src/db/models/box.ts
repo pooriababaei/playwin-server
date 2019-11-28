@@ -3,8 +3,6 @@ const Schema = mongoose.Schema;
 
 const boxSchema = new Schema({
 
-    name: {type: String , required:true},
-
     type:{type : Number},
 
     price: {type: Number , required:true},

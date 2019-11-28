@@ -7,8 +7,36 @@ import {PLAYWIN_API_URL} from '../utils/globals';
 //const merchantId = fs.readFileSync(path.join(__dirname, '../keys/merchant_key')).toString();
 const zarinpal = ZarinpalCheckout.create(process.env.MERCHANT_ID, false);
 const Box = mongoose.model('box');
+const User = mongoose.model('user');
 const BoxPurchase = mongoose.model('boxPurchase');
 const debug = Debug('BoxPurchase Controller:');
+
+///////// helper functions
+function saveBoxTransaction(userId, transactionId, boxId) {
+    const p = {
+        user: userId,
+        transactionId,
+        box: boxId
+    };
+    const transaction = new BoxPurchase(p);
+    return new Promise((resolve, reject) => {
+        transaction.save((err, transaction) => {
+            if (err) {
+                reject(err);
+            }
+            else if (transaction) {
+                resolve(transaction);
+ }
+        });
+    })
+} // used inside of buyBox
+async function buyBox(userId, transactionId, boxId) {
+    const box = await Box.findById(boxId);
+    const [user, bt]: any = Promise.all([User.findOneAndUpdate({_id: userId}, {$inc: {coupons: box.coupons}},
+         {new: true}), saveBoxTransaction(userId, transactionId, boxId)]);
+    return {user, transaction: bt};
+}  // not sure how the usage will be. from client or an payment api.
+///////// end of helper function
 
 export function purchaseBox(req, res) {
     Box.findById(req.params.boxId, (err, box) => {

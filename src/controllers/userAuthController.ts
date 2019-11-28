@@ -8,7 +8,7 @@ const debug = Debug('UserAuth Controller:');
 const User = mongoose.model('user');
 const Auth = mongoose.model('auth');
 
-export function getAuthCode (req,res) {
+export function getAuthCode(req, res) {
     const info = {
         phoneNumber: req.params.phoneNumber
     };
@@ -32,7 +32,7 @@ export function getAuthCode (req,res) {
     }
 }
 
-export function auth(req, res){
+export function auth(req, res) {
     Auth.authenticate(req.params.phoneNumber, req.params.token).then((userAuth) => {
         if (userAuth) {
             User.findOne({phoneNumber: req.params.phoneNumber}, (err, user) => {
@@ -54,7 +54,7 @@ export function auth(req, res){
     });
 }
 
-export function checkUniqueUsername (req,res) {
+export function checkUniqueUsername(req, res) {
     const username = req.params.username;
     User.findOne({username}, (err, user) => {
         if (err) { return res.sendStatus(500); }
@@ -63,7 +63,7 @@ export function checkUniqueUsername (req,res) {
     });
 }
 
-export async function signup (req,res) {
+export async function signup(req, res) {
     const info = _.pick(req.body, 'username', 'phoneNumber', 'avatar');
     if(!req.body.username) {
         let username = null;

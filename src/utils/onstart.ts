@@ -12,7 +12,7 @@ if (!process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === '0') {
     createDirectories();
 }
 Achievement.createAchievements();
-initiateGiveRewardCronForAllLeagues();
+//initiateGiveRewardCronForAllLeagues();
 
 async function initiateGiveRewardCronForAllLeagues() {
     const leagues = await League.find().lean();

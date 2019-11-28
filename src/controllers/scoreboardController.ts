@@ -1,13 +1,64 @@
+import Debug from 'debug';
 import mongoose from 'mongoose';
+import {ADVERTISE_AWARD_COUPON} from '../utils/globals';
 const User = mongoose.model('user');
 const WeeklyLeader = mongoose.model('weeklyLeader');
-import Debug from 'debug';
-import * as dbFunctions from '../utils/dbFunctions';
-import {ADVERTISE_AWARD_COUPON} from '../utils/globals';
 const debug = Debug('Scoreboard Controller:');
 
+///////// helper functions
+async function surroundingUsersHelper(league, userId, limit) {
+    const Scoreboard = mongoose.model(league);
+    const user = await Scoreboard.findOne({user: userId});
+    if (!user) { throw 400; }
+    let count = await Scoreboard.find({
+        $or: [{score: {$gt: user.score}},
+            {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
+    }).sort({score: -1, updatedAt: 1}).countDocuments();
+
+    const rank = !count ? 1 : count + 1;
+
+    const [worse, better] = await Promise.all([
+        Scoreboard.find({
+            user: {$ne: userId},
+            $or: [{score: {$lt: user.score}},
+                {$and: [{score: user.score}, {updatedAt: {$gt: user.updatedAt}}]}]
+        }).sort({score: -1, updatedAt: 1}).limit(limit).populate({path: 'user', select: 'username avatar'}).lean(),
+
+        Scoreboard.find({
+            user: {$ne: userId},
+            $or: [{score: {$gt: user.score}},
+                {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
+        }).sort({score: 1, updatedAt: -1}).limit(limit).populate({path: 'user', select: 'username avatar'}).lean(),
+    ]);
+
+    let page = better.reverse().concat(user).concat(worse);
+    const userIndex = page.findIndex((record) => {
+        return record.user === userId;
+    });
+
+    for (let i = 0; i < page.length; i++) {
+        page[i].rank = rank + (i - userIndex);
+    }
+    return page;
+}
+async function userRankHelper(league, userId) {
+
+    const Scoreboard = mongoose.model(league);
+    const user = await Scoreboard.findOne({user: userId});
+    const count = await Scoreboard.find({
+        $or: [{score: {$gt: user.score}},
+            {$and: [{score: user.score}, {updatedAt: {$lt: user.updatedAt}}]}]
+    }).sort({score: -1, updatedAt: 1}).countDocuments();
+
+    if (!count) {
+        return 1;
+    }
+    return count + 1;
+}
+///////// end of helper functions
+
 export function modifyScoreboard(req, res) {
-    let Scoreboard = mongoose.model(req.league.collectionName);
+    const Scoreboard = mongoose.model(req.league.collectionName);
 
     if (!Scoreboard) {
         return res.sendStatus(400);
@@ -264,7 +315,7 @@ export function modifyScoreboard(req, res) {
     }
 }
 
-export function userRecord(req, res) {
+export function getUserRecord(req, res) {
     const Scoreboard = mongoose.model(req.params.collectionName);
     if (!Scoreboard) {
         return res.sendStatus(400);
@@ -284,12 +335,12 @@ export function userRecord(req, res) {
     });
 }
 
-export function userRank(req, res) {
+export function getUserRank(req, res) {
     const league = req.params.collectionName;
-    dbFunctions.userRank(league, req.userId).then((rank) => {
+    userRankHelper(league, req.userId).then((rank) => {
         if (rank) {
             return res.status(200).json({
-                rank: rank
+                rank
             });
         } else {
             return res.status(404).send();
@@ -299,14 +350,14 @@ export function userRank(req, res) {
     });
 }
 
-export function surroundingUsers(req, res) {
+export function getSurroundingUsers(req, res) {
     const league = req.params.collectionName;
     const limit = parseInt(req.params.limit);
 
-    dbFunctions.surroundingUsers(league, req.userId, limit).then(page => {
+    surroundingUsersHelper(league, req.userId, limit).then((page) => {
         return res.status(200).json(page);
-    }).catch(err => {
-        if (err == 400) {
+    }).catch((err) => {
+        if (err === 400) {
             return res.sendStatus(400);
         }
         return res.sendStatus(500);
@@ -344,7 +395,7 @@ export async function getRecords(req, res) {
     }).status(200).send(records);
 }
 
-export async function weeklyLeaders(req, res) {
+export async function getWeeklyLeaders(req, res) {
     const pipeline = [{
             $group: {
                 _id: '$user',
@@ -387,4 +438,17 @@ export async function weeklyLeaders(req, res) {
             }
             res.status(200).json(result);
         });
+}
+
+export async function getTopUsers(req,res) {
+    User.find()
+    .limit(100)
+    .skip(0)
+    .sort({totalCoins: -1})
+    .exec((err, result) => {
+        if (err) {
+            return res.sendStatus(500);
+        }
+        return res.status(200).send(result);
+    });
 }

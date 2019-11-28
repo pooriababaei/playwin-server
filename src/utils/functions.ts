@@ -1,5 +1,7 @@
 import fs from 'fs';
+import Kavenegar from 'kavenegar';
 import path from 'path';
+
 export function createDirectories() {
     const dir = path.join(__dirname, '../../public/');
     const dir1 = path.join(__dirname, '../../public/leagues');
@@ -19,7 +21,6 @@ export function createDirectories() {
     }
 }
 export function sendSMS(phone, code) {
-    let Kavenegar = require('kavenegar');
     let api = Kavenegar.KavenegarApi({apikey: '724658576A51787A35486A4C7546714A534F376A4A433856495372384A5A3673'});
     api.Send({ message: `کد فعال سازی شما در پلی وین: ${code}`, receptor: phone });
 }

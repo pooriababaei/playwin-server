@@ -7,13 +7,10 @@ import rimraf from 'rimraf';
 import _ from 'underscore';
 import urljoin from 'url-join';
 import scoreboardSchema from '../db/models/scoreboard';
-import {
-    giveRewards
-} from '../utils/dbFunctions';
+import {giveRewardsHelper} from './currencyController';
+import {createJobHelper, deleteJobHelper} from './jobController';
 const League = mongoose.model('league');
-
 const Job = mongoose.model('job');
-
 const debug = Debug('League Controller:');
 
 export async function getLeagues(req, res) {
@@ -143,49 +140,25 @@ export async function createLeague(req, res) {
 
     if (req.files && req.files.images) {
         for (let i = 0; i < req.files.images.length; i++) {
-            let temp = '/public/leagues/' + req.body.collectionName + '/images/' + req.files.images[i].filename;
+            const temp = '/public/leagues/' + req.body.collectionName + '/images/' + req.files.images[i].filename;
             images.push(temp);
         }
         info.images = images;
     }
-
-    const league = new League(info);
-    league.save((err, league) => {
-        if (err) {
-            debug(err);
-            return res.status(400).send();
-        }
-        mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
-        const job = new Job({
+    const league = await new League(info).save().catch(() => {});
+    if (!league) { return res.sendStatus(400); }
+    mongoose.model(league.collectionName, scoreboardSchema(league.defaultOpportunities, league.collectionName));
+    const job = {
             property: league.collectionName,
             type: 'reward',
-            fireTime: league.endTime,
+            fireTime: new Date(league.endTime),
             processOwner: process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null
-        });
-        job.save((err, job) => {
-            if (job) {
-                schedule.scheduleJob(league.collectionName, league.endTime, async (fireTime) => {
-                    const jobInFireTime = await Job.findOne({
-                        property: this.name,
-                        type: 'reward'
-                    });
-                    if (jobInFireTime && Math.abs(new Date(jobInFireTime.fireTime).getTime() - fireTime.getTime()) < 1000 &&
-                        (!jobInFireTime.processOwner || jobInFireTime.processOwner == process.env.NODE_APP_INSTANCE)) {
-                        giveRewards(league.collectionName).then(() => {
-                            debug('rewarded');
-                            Job.deleteOne({
-                                property: league.collectionName,
-                                type: 'reward'
-                            }).exec();
-                        }).catch(() => {
-                            debug('error in rewarding');
-                        });
-                    }
-                });
-            }
-            return res.status(200).send(league);
-        });
-
+        };
+    createJobHelper(job, giveRewardsHelper, true)
+    .then(() => res.status(200).send(league))
+    .catch((err) => {
+        debug(err);
+        return res.sendStatus(500);
     });
 }
 
@@ -249,15 +222,13 @@ export async function updateLeague(req, res) {
         new: true
     }, (err, league) => {
         if (err) {
-            console.log(err);
             return res.status(400).send();
         } else if (!league) {
             return res.sendStatus(404);
         }
-
         if (shouldSchedule) {
             const job = {
-                fireTime: league.endTime,
+                fireTime: new Date(league.endTime),
                 processOwner: process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null
             };
             Job.findOneAndUpdate({
@@ -271,24 +242,12 @@ export async function updateLeague(req, res) {
                     if (!dbJob.processOwner || dbJob.processOwner === process.env.NODE_APP_INSTANCE) {
                         schedule.rescheduleJob(league.collectionName, league.endTime);
                     } else {
-                        schedule.scheduleJob(league.collectionName, league.endTime, async function (fireTime) {
-                            const jobInFireTime = await Job.findOne({
-                                property: this.name,
-                                type: 'reward'
-                            });
-                            if (jobInFireTime && Math.abs(new Date(jobInFireTime.fireTime).getTime() - fireTime.getTime()) < 1000 
-                            && (!jobInFireTime.processOwner || jobInFireTime.processOwner == process.env.NODE_APP_INSTANCE)) {
-                                giveRewards(league.collectionName).then(() => {
-                                    debug('rewarded');
-                                    Job.deleteOne({
-                                        property: league.collectionName,
-                                        type: 'reward'
-                                    }).exec();
-                                }).catch(() => {
-                                    debug('error in rewarding');
-                                });
-                            }
-                        });
+                    createJobHelper(dbJob, giveRewardsHelper, false)
+                    .then(() => res.status(200).send(league))
+                    .catch((err) => {
+                        debug(err);
+                        return res.sendStatus(500);
+                    });
                     }
                 }
             });
@@ -313,11 +272,7 @@ export async function deleteLeague(req, res) {
                 }
             });
             rimraf.sync(path.join(__dirname, '../../public/leagues', league.collectionName));
-            Job.deleteOne({
-                property: league.collectionName,
-                type: 'reward'
-            }).exec();
-            schedule.cancelJob(league.collectionName);
+            deleteJobHelper(league.collectionName, 'reward').catch(() => {});
             return res.status(200).send({
                 data: league
             });

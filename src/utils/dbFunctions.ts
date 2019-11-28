@@ -91,7 +91,7 @@ export async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // tr
 
             const record = await Scoreboard.findOne({user: userId});
             let newRecord = null;
-    
+
             if (record == null) {
                 if (league.maxOpportunities &&  parseInt(oppo) + parseInt(league.dafaultOpportunities) > parseInt(league.maxOpportunities)) {
                     throw 2; //this is somehow a bad request. client mistake!!!
@@ -99,7 +99,7 @@ export async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // tr
                 newRecord = {
                     user: userId,
                     played: 0,
-                    avatar:userInfo.avatar,
+                    avatar: userInfo.avatar,
                     opportunities: league.defaultOpportunities + oppo,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
@@ -107,7 +107,7 @@ export async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // tr
             }
             else if (record) {
                 if (league.maxOpportunities && parseInt(record.played) + parseInt(oppo) + parseInt(record.opportunities) > parseInt(league.maxOpportunities)) {
-                    throw 2;  //this is somehow a bad request. client mistake!!!
+                    throw 2;  // this is somehow a bad request. client mistake!!!
                 }
 
                 newRecord = record;
@@ -115,11 +115,11 @@ export async function exchangecouponsToLeagueOppo(userId, oppo, league) {  // tr
             }
 
             const newRecordToSave = new Scoreboard(newRecord);
-            const [nr, user] : any = await Promise.all([newRecordToSave.save(opts), User.findOneAndUpdate({_id: userId},
+            const [nr, user]: any = await Promise.all([newRecordToSave.save(opts), User.findOneAndUpdate({_id: userId},
                  {$inc: {coupons: 0 - oppo}}, {session,new: true})]);
             await session.commitTransaction();
             session.endSession();
-            return {record: nr, user: user};
+            return {record: nr, user};
         } else {
         throw 1;
         } // not enough oppo
@@ -166,7 +166,7 @@ export async function giveRewards(collectionName) {
         if(league.endTime >= Date.now() || league.rewarded === true) {
             throw 400;
         }
-        const coinUsers: any = await getRecords(league.collectionName,league.leadersNumber,1);
+        const coinUsers: any = await getRecords(league.collectionName,league.leadersNumber, 1);
         for (const record of coinUsers) {
             await User.findOneAndUpdate({_id: record.user},
                 {$inc: {coins: league.coinsReward, totalCoins: league.coinsReward}},opts);

@@ -1,15 +1,16 @@
 import express from 'express';
 import * as scoreboardController from '../controllers/scoreboardController';
 import {isApp, isLeagueUp, isUser,isUserOrAdmin} from '../utils/middlewares';
-let router = express.Router();
+const router = express.Router();
 import Debug from 'debug';
 const debug = Debug('Scorebaord Route:');
 
-router.get('/weeklyLeaders',isUserOrAdmin,scoreboardController.weeklyLeaders);
+router.get('/weeklyLeaders',isUserOrAdmin,scoreboardController.getWeeklyLeaders);
 router.get('/:collectionName',isUserOrAdmin, scoreboardController.getRecords);
 router.get('/modifyScoreboard/:collectionName/:type',isUser, isApp, isLeagueUp, scoreboardController.modifyScoreboard);
-router.get('/userRecord/:collectionName',isUser,scoreboardController.userRecord);
-router.get('/userRank/:collectionName', isUser, scoreboardController.userRank);
-router.get('/surroundingUsers/:collectionName/:limit', isUser, scoreboardController.surroundingUsers);
+router.get('/userRecord/:collectionName',isUser,scoreboardController.getUserRecord);
+router.get('/userRank/:collectionName', isUser, scoreboardController.getUserRecord);
+router.get('/surroundingUsers/:collectionName/:limit', isUser, scoreboardController.getSurroundingUsers);
+router.get('/topUsers', isUserOrAdmin,scoreboardController.getTopUsers);
 
 export default router;

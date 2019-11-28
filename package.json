@@ -54,6 +54,7 @@
   "devDependencies": {
     "@types/express": "^4.17.2",
     "@types/node": "^12.12.7",
+    "@types/node-schedule": "^1.2.4",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
   }
