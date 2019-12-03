@@ -441,7 +441,7 @@ export async function getWeeklyLeaders(req, res) {
 }
 
 export async function getTopUsers(req,res) {
-    User.find()
+    User.find({}, 'avatar username totalCoins')
     .limit(100)
     .skip(0)
     .sort({totalCoins: -1})
