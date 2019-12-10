@@ -42,7 +42,7 @@ function toLower(v) {
     return v.toLowerCase();
 }
 
-userSchema.methods.generateToken = function () {
+userSchema.methods.generateToken = function() {
     let user = this;
     return jwt.sign({
         _id: user._id,
@@ -53,7 +53,7 @@ userSchema.methods.generateToken = function () {
     }, process.env.USER_KEY).toString();
 };
 
-userSchema.statics.findByUsername = (username, password) => {
+userSchema.statics.findByUsername = function(username, password) {
     const User = this;
     return User.findOne({username}).then((user) => {
         if (!user) {

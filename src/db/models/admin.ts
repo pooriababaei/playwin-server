@@ -35,7 +35,7 @@ function toLower(v) {
     return v.toLowerCase();
 }
 
-adminSchema.methods.generateToken = () => {
+adminSchema.methods.generateToken = function() {
     let admin = this;
     return jwt.sign({
         _id: admin._id,
@@ -46,7 +46,7 @@ adminSchema.methods.generateToken = () => {
     }, process.env.ADMIN_KEY).toString();
 };
 
-adminSchema.statics.findByUsername = (username, password) => {
+adminSchema.statics.findByUsername = function(username, password) {
     const Admin = this;
 
     return Admin.findOne({username}).then((admin) => {
@@ -65,7 +65,7 @@ adminSchema.statics.findByUsername = (username, password) => {
         });
     });
 };
-adminSchema.statics.findByEmail = (email, password) => {
+adminSchema.statics.findByEmail = function(email, password) {
     const Admin = this;
     return Admin.findOne({email}).then((admin) => {
         if (!admin) {
@@ -84,7 +84,7 @@ adminSchema.statics.findByEmail = (email, password) => {
     });
 };
 
-adminSchema.pre('save', function (next) {
+adminSchema.pre('save', function(next) {
     let admin = this;
     if (admin.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
@@ -98,7 +98,7 @@ adminSchema.pre('save', function (next) {
     }
 });
 
-adminSchema.virtual('id').get(function () {
+adminSchema.virtual('id').get(function() {
     return this._id;
 });
 

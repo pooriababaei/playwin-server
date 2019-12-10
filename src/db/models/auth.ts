@@ -13,9 +13,8 @@ const authSchema = new Schema({
 
 }, {collection: 'auth'});
 
-authSchema.statics.authenticate = function (phoneNumber, authToken) {
+authSchema.statics.authenticate = function(phoneNumber, authToken) {
     let Auth = this;
-    debug(phoneNumber);
     const user = {
         phoneNumber: phoneNumber,
         authToken: authToken
@@ -33,11 +32,9 @@ authSchema.statics.authenticate = function (phoneNumber, authToken) {
 
         });
 };
-
-authSchema.pre('save', (next) => {
-    const user = this;
-    user.authToken = Math.floor(Math.random() * (99999 - 10000) + 10000);
-    next();
+authSchema.pre('save', function(next) {
+    this.authToken = Math.floor(Math.random() * (99999 - 10000) + 10000);
+    return next();
 });
 
 export default mongoose.model('auth', authSchema);
