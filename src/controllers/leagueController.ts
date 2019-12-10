@@ -76,10 +76,12 @@ export async function getLeagues(req, res) {
             for (const record of leadersPlayedTimes) {
                 sum += record.played;
             }
-            if (league.playersNumber < league.leadersNumber) 
+            if (league.playersNumber < league.leadersNumber && league.playersNumber !== 0)
                 league.leadersAveragePlayedTimes = sum / league.playersNumber;
-            else
+            else if (league.leadersNumber !== 0)
                 league.leadersAveragePlayedTimes = sum / league.leadersNumber;
+            else
+                league.leadersAveragePlayedTimes = 0;
         }
     }
 
