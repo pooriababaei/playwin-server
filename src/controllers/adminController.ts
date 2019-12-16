@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import _ from 'underscore';
 const Admin = mongoose.model('admin');
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import Debug from 'debug';
 const debug = Debug('Admin Controller:');
 
@@ -35,7 +35,7 @@ export function createAdmin (req, res) {
 export function updateAdmin (req, res) {
   const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email','role');
   if (info.password) {
-    const salt= bcrypt.genSaltSync(10);
+    const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(info.password, salt);
     info.password = hash;
   }
