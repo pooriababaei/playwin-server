@@ -323,7 +323,10 @@ export function getUserRecord(req, res) {
 
     Scoreboard.findOne({
         user: req.userId
-    }, (err, result) => {
+    }).populate({
+        path: 'user',
+        select: 'username avatar'
+    }).exec((err, result) => {
         if (err) {
             return res.status(500).send();
         } else if (result) {
@@ -440,7 +443,7 @@ export async function getWeeklyLeaders(req, res) {
         });
 }
 
-export async function getTopUsers(req,res) {
+export async function getTopUsers(req, res) {
     User.find({}, 'avatar username totalCoins')
     .limit(100)
     .skip(0)
