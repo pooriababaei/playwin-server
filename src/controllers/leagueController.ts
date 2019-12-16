@@ -92,17 +92,40 @@ export async function getLeagues(req, res) {
 
 }
 
-export function getLeague(req, res) {
-    League.findById(req.params.id, (err, league) => {
-        if (err) {
-            return res.sendStatus(500);
-        }
-        if (!league) {
+export async function getLeague(req, res) {
+   // const validId = mongoose.Types.ObjectId(req.params.id);
+   // console.log(validId);
+   try{
+    let league = await League.findById(req.params.id).lean();
+    if (!league) {
             return res.sendStatus(404);
         }
-        return res.status(200).json(league);
-    });
-
+    if (league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
+            const Scoreboard = mongoose.model(league.collectionName);
+            league.playersNumber = await Scoreboard.find().countDocuments();
+            const leadersPlayedTimes = await Scoreboard.find({}, 'played')
+                .limit(league.leadersNumber)
+                .skip(0)
+                .sort({
+                    score: -1,
+                    updatedAt: 1
+                })
+                .lean();
+            let sum = 0;
+            for (const record of leadersPlayedTimes) {
+                sum += record.played;
+            }
+            if (league.playersNumber < league.leadersNumber && league.playersNumber !== 0)
+                league.leadersAveragePlayedTimes = sum / league.playersNumber;
+            else if (league.leadersNumber !== 0)
+                league.leadersAveragePlayedTimes = sum / league.leadersNumber;
+            else
+                league.leadersAveragePlayedTimes = 0;
+        }
+    return res.status(200).send(league);
+   } catch (e) {
+       return res.sendStatus(500);
+   }
 }
 
 export async function createLeague(req, res) {
