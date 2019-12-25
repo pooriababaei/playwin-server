@@ -1,18 +1,20 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import { Model, model, Schema } from "mongoose";
+import { Box } from "../../interfaces/box";
 
-const boxSchema = new Schema({
+const boxSchema = new Schema(
+  {
+    type: { type: Number },
 
-    type:{type : Number},
+    price: { type: Number, required: true },
 
-    price: {type: Number , required:true},
+    offPrice: { type: Number },
 
-    offPrice: {type: Number},
+    coupon: { type: Number },
 
-    coupons:{type:Number},
+    endTime: { type: Date }
+  },
+  { versionKey: false }
+);
 
-    endTime:{type:Date},
-
-});
-
-export default mongoose.model('box', boxSchema);
+const boxModel: Model<Box> = model<Box>("box", boxSchema);
+export default boxModel;

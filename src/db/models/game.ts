@@ -1,33 +1,25 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
-const gameSchema = new Schema({
+import { Model, model, Schema } from "mongoose";
+import { Game } from "../../interfaces/game";
+const gameSchema = new Schema(
+  {
+    name: { type: String, minLength: 3, required: true },
 
-    name: {type: String, minLength: 3 , required : true},
+    description: { type: String },
 
-    description: {type: String},
+    available: { type: Boolean, default: false },
 
-    available: {type: Boolean, default: false},
+    images: [{ type: String }],
 
-    images: [{type: String}],
+    mainImage: { type: String, required: true },
 
-    mainImage: {type: String, required: true},
+    html: { type: String },
 
-    gif: {type: String},
+    gameZip: { type: String },
 
-    game: {type: String},
+    color: { type: String }
+  },
+  { versionKey: false }
+);
 
-    html:{type: String},
-
-    gameZip : {type :String},
-
-    baseColor : {type: String},
-
-    secondaryColor : {type: String}
-});
-
-/*gameSchema.pre('save', function (next) {
-    let game = this;
-    next();
-});*/
-
-export default mongoose.model('game', gameSchema);
+const gameModel: Model<Game> = model<Game>("game", gameSchema);
+export default gameModel;

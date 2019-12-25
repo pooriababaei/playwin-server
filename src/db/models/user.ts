@@ -1,75 +1,90 @@
-import bcrypt from 'bcryptjs';
-import fs from 'fs';
-import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
-import path from 'path';
-//const user_key = fs.readFileSync(path.join(__dirname, '../../keys/user_key')).toString();
-const Schema = mongoose.Schema;
-const userSchema: any = new Schema({
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { Model, model, Schema } from "mongoose";
+import { User } from "../../interfaces/user";
+const userSchema: any = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      set: toLower,
+      index: true
+    },
 
-    username: {type: String, required: true, unique: true, trim: true, set: toLower, index: true},
+    invitingUsers: [{ type: Schema.Types.ObjectId, ref: "user" }],
 
-    invitingUsers: [{type: Schema.Types.ObjectId, ref : 'user'}],
+    reward: { type: Number, default: 0, index: true },
 
-    coins: {type: Number, default: 0, index : true},
+    totalReward: { type: Number, default: 0, index: true },
 
-    totalCoins:{type: Number, default: 0, index: true},
+    coupon: { type: Number, default: 100 },
 
-    coupons: {type: Number, default: 100},
+    achievements: [{ type: Schema.Types.ObjectId, ref: "achievement" }],
 
-    achievements: [{type: Schema.Types.ObjectId, ref : 'achievement'}],
+    participatedLeagues: [{ type: Schema.Types.ObjectId, ref: "league" }],
 
-    participatedLeagues: [{type: Schema.Types.ObjectId, ref: 'league'}],
+    phoneNumber: { type: String, required: true, unique: true, index: true },
 
-    phoneNumber: {type: String, required: true, unique: true , index: true},
+    account: { type: String },
 
-    account: {type: String},
+    loyalty: { type: Number, default: 0, index: true },
 
-    loyalties: {type: Number, default: 0, index : true},
+    avatar: { type: String, default: "0" },
 
-    avatar: {type: String, default: '0'},
-
-    appSource: {type: String}  // each number for an app source like :bazaar , playStore,directP
-
-}, {
+    appSource: { type: String } // each number for an app source like :bazaar , playStore,directP
+  },
+  {
     timestamps: {
-        createdAt: 'createdAt',
-        updatedAt: 'updatedAt'
-    }
-});
-userSchema.index({createdAt:1});
+      createdAt: "createdAt",
+      updatedAt: "updatedAt"
+    },
+    versionKey: false
+  }
+);
+userSchema.index({ createdAt: 1 });
 function toLower(v) {
-    return v.toLowerCase();
+  return v.toLowerCase();
 }
 
 userSchema.methods.generateToken = function() {
-    let user = this;
-    return jwt.sign({
+  let user = this;
+  return jwt
+    .sign(
+      {
         _id: user._id,
         username: user.username,
         phoneNumber: user.phoneNumber,
-        avatar:user.avatar,
-        role: 'user'
-    }, process.env.USER_KEY).toString();
+        avatar: user.avatar,
+        role: "user"
+      },
+      process.env.USER_KEY
+    )
+    .toString();
 };
 
 userSchema.statics.findByUsername = function(username, password) {
-    const User = this;
-    return User.findOne({username}).then((user) => {
-        if (!user) {
-            return Promise.reject();
+  const User = this;
+  return User.findOne({ username }).then(user => {
+    if (!user) {
+      return Promise.reject();
+    }
+    return new Promise((resolve, reject) => {
+      // Use bcrypt.compare to compare password and user.password
+      bcrypt.compare(password, user.password, (err, res) => {
+        if (res) {
+          resolve(user);
+        } else {
+          reject(err);
         }
-        return new Promise((resolve, reject) => {
-            // Use bcrypt.compare to compare password and user.password
-            bcrypt.compare(password, user.password, (err, res) => {
-                if (res) {
-                    resolve(user);
-                } else {
-                    reject(err);
-                }
-            });
-        });
+      });
     });
+  });
 };
 
-export default mongoose.model('user', userSchema);
+interface UserModel extends Model<User> {
+  fundByUsername: (username: string, password: string) => any;
+}
+const userModel: Model<User> = model<User>("user", userSchema);
+export default userModel;
