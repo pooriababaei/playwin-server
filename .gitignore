@@ -3,3 +3,5 @@ public/
 log/
 server.log
 .idea/
+yarn.lock
+yarn-error.log

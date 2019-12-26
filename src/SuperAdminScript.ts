@@ -1,36 +1,26 @@
-import Debug from "debug";
-import { dbUrl } from "./db/dbConfig";
-const debug = Debug("Mondb:");
+import Debug from 'debug';
+import { dbUrl } from './db/dbConfig';
+const debug = Debug('Mondb:');
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-mongoose.set("useNewUrlParser", true);
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 mongoose.Promise = global.Promise;
 
-// require('./dependencies/models/user');
-// require('./models/auth');
-// require('./models/game');
-import "./db/models/admin";
-import "./db/models/league";
+import League from './db/models/league';
+import Admin from './db/models/admin';
 
-// require('./models/boxTransaction');
-// require('./models/toPay');
-// require('./models/box');
-// require('./models/avatar');
-
-const League = mongoose.model("league");
-const Admin = mongoose.model("admin");
-
-import scoreboardSchema from "./db/models/scoreboard";
+import { scoreboardModel } from './db/models/scoreboard';
+//import { League } from './interfaces/league';
 
 // mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then(() => {
 mongoose
   .connect(dbUrl, {
     keepAlive: true,
     keepAliveInitialDelay: 300000,
-    replicaSet: "rs0",
+    replicaSet: 'rs0',
     useUnifiedTopology: true
   })
   .then(() => {
@@ -40,15 +30,12 @@ mongoose
       }
       if (!err) {
         leagues.forEach(item => {
-          mongoose.model(
-            item.collectionName,
-            scoreboardSchema(item.dafaultOpportunity, item.collectionName)
-          );
+          scoreboardModel(item.collectionName, item.defaultOpportunity);
         });
       }
-      debug("database connected :)");
+      debug('database connected :)');
       createSuperAdmin().then(() => {
-        console.log("done");
+        console.log('done');
       });
     });
   })
@@ -58,23 +45,23 @@ mongoose
 
 async function createSuperAdmin() {
   const admin = new Admin({
-    username: "pooriya",
-    password: "Playwin@2019",
-    name: "pooriya babaei",
-    email: "pooriya.babaei.1997@gmail.com",
-    phone: "09139236452",
-    role: "superadmin"
+    username: 'pooriya',
+    password: 'Playwin@2019',
+    name: 'pooriya babaei',
+    email: 'pooriya.babaei.1997@gmail.com',
+    phone: '09139236452',
+    role: 'superadmin'
   });
   await admin.save();
   return true;
 }
 async function f() {
   let st = Date.now();
-  let Scoreboard = mongoose.model("superleague");
+  let Scoreboard = mongoose.model('superleague');
   for (let i = 0; i < 600000; i++) {
     let record = new Scoreboard({
-      user: "5cd48dbf6b63f015483125a1",
-      username: "nabi",
+      user: '5cd48dbf6b63f015483125a1',
+      username: 'nabi',
       score: Math.floor(Math.random() * 10000),
       opportunity: i,
       avatar: Math.floor(Math.random() * 3)
