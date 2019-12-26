@@ -499,14 +499,14 @@ export async function getWeeklyLeaders(req, res) {
     {
       $group: {
         _id: '$user',
-        weeklyReward: {
+        totalReward: {
           $sum: '$reward'
         }
       }
     },
     {
       $sort: {
-        weeklyReward: -1
+        totalReward: -1
       }
     },
     {
@@ -524,7 +524,7 @@ export async function getWeeklyLeaders(req, res) {
       $project: {
         _id: 0,
         username: '$user.username',
-        weeklyReward: 1,
+        totalReward: 1,
         avatar: '$user.avatar'
       }
     }
