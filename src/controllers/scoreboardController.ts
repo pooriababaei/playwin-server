@@ -89,7 +89,7 @@ async function userRankHelper(league, userId) {
 
 export function modifyScoreboard(req, res) {
   if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
-    return res.sendStatus(400);
+    return res.sendStatus(404);
   }
   const Scoreboard = scoreboardModel(req.league.collectionName);
 
@@ -404,7 +404,7 @@ export function modifyScoreboard(req, res) {
 
 export function getUserRecord(req, res) {
   if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
-    return res.sendStatus(400);
+    return res.sendStatus(404);
   }
   const Scoreboard = scoreboardModel(req.params.collectionName);
 
@@ -427,6 +427,9 @@ export function getUserRecord(req, res) {
 }
 
 export function getUserRank(req, res) {
+  if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
+    return res.sendStatus(400);
+  }
   const league = req.params.collectionName;
   userRankHelper(league, req.userId)
     .then(rank => {
@@ -444,6 +447,9 @@ export function getUserRank(req, res) {
 }
 
 export function getSurroundingUsers(req, res) {
+  if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
+    return res.sendStatus(404);
+  }
   const league = req.params.collectionName;
   const limit = parseInt(req.params.limit);
 
@@ -460,6 +466,9 @@ export function getSurroundingUsers(req, res) {
 }
 
 export async function getRecords(req, res) {
+  if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
+    return res.sendStatus(400);
+  }
   const league = req.params.collectionName;
   const limit = parseInt(req.query.perPage);
   const page = parseInt(req.query.page);
@@ -467,14 +476,14 @@ export async function getRecords(req, res) {
   // if (filter !== null && Object.keys(filter).length !== 0 && obj.constructor === Object)
   //    filter = JSON.parse(req.query.filter);
 
-  const Scoreboard = mongoose.model(league);
+  const Scoreboard = scoreboardModel(league);
   const sort = {
     score: -1,
     updatedAt: 1
   };
   // if (filter && filter.username) query.find({username: { $regex: '.*' + filter.username + '.*' } });
   // if (filter && filter.phoneNumber) query.find({phoneNumber: { $regex: '.*' + filter.phoneNumber + '.*' }});
-  let count = await Scoreboard.find().countDocuments();
+  const count = await Scoreboard.find().countDocuments();
   const records = await Scoreboard.find()
     .limit(limit)
     .skip(limit * (page - 1))
