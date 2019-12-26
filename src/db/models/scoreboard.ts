@@ -1,7 +1,7 @@
 import { Model, model, Schema } from 'mongoose';
 import { Scoreboard } from '../../interfaces/scoreboard';
-export function scoreboardModel(collectionName?, opp?): Model<Scoreboard> {
-  if (opp !== null && collectionName !== null) {
+export function scoreboardModel(collectionName, opp?): Model<Scoreboard> {
+  if (opp != null) {
     const scoreboardSchema = new Schema(
       {
         user: { type: Schema.Types.ObjectId, ref: 'user', index: true },

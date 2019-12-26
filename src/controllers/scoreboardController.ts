@@ -88,11 +88,10 @@ async function userRankHelper(league, userId) {
 ///////// end of helper functions
 
 export function modifyScoreboard(req, res) {
-  const Scoreboard = scoreboardModel(req.league.collectionName);
-
-  if (!Scoreboard) {
+  if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
     return res.sendStatus(400);
   }
+  const Scoreboard = scoreboardModel(req.league.collectionName);
 
   if (req.params.hasOwnProperty('type')) {
     switch (parseInt(req.params.type)) {
@@ -404,10 +403,10 @@ export function modifyScoreboard(req, res) {
 }
 
 export function getUserRecord(req, res) {
-  const Scoreboard = mongoose.model(req.params.collectionName);
-  if (!Scoreboard) {
+  if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
     return res.sendStatus(400);
   }
+  const Scoreboard = scoreboardModel(req.params.collectionName);
 
   Scoreboard.findOne({
     user: req.userId
