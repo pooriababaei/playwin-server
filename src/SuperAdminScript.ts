@@ -13,7 +13,6 @@ import League from './db/models/league';
 import Admin from './db/models/admin';
 
 import { scoreboardModel } from './db/models/scoreboard';
-//import { League } from './interfaces/league';
 
 // mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000}).then(() => {
 mongoose
