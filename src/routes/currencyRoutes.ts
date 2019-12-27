@@ -1,32 +1,32 @@
-import Debug from "debug";
-import express from "express";
-import * as currencyController from "../controllers/currencyController";
+import Debug from 'debug';
+import express from 'express';
+import * as currencyController from '../controllers/currencyController';
 import {
   isAdmin,
   isLeagueUp,
   isUser,
   isUserOrAdmin
-} from "../utils/middlewares";
-let router = express.Router();
-const debug = Debug("Currency Route:");
+} from '../utils/middlewares';
+const router = express.Router();
+const debug = Debug('Currency Route:');
 
 router.get(
-  "/exchangecouponToLeagueOppo/:collectionName/:opportunity/",
+  '/exchangecouponToLeagueOppo/:collectionName/:opportunity/',
   isUser,
   isLeagueUp,
   currencyController.exchangecouponToLeagueOppo
 );
 router.get(
-  "/exchangerewardToMoney/:reward",
+  '/exchangeRewardToMoney/:reward',
   isUser,
-  currencyController.exchangerewardToMoney
+  currencyController.exchangeRewardToMoney
 );
 router.put(
-  "/rewardLeagueWinners/:collectionName",
+  '/rewardLeagueWinners/:collectionName',
   isAdmin,
   currencyController.giveRewards
 );
-router.get("/achievements", isUserOrAdmin, currencyController.achievements);
-router.get("/achieve/:id", isUser, currencyController.achieve);
+router.get('/achievements', isUserOrAdmin, currencyController.achievements);
+router.get('/achieve/:id', isUser, currencyController.achieve);
 
 export default router;

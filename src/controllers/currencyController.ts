@@ -1,6 +1,6 @@
 import Debug from 'debug';
 import mongoose from 'mongoose';
-import { REWARD_TRESHOLD_TO_EXCHANGE, REWARD_PRICE } from '../utils/globals';
+import { REWARD_TRESHOLD_TO_EXCHANGE } from '../utils/globals';
 import ToPay from '../db/models/toPay';
 import User from '../db/models/user';
 import League from '../db/models/league';
@@ -12,8 +12,6 @@ const debug = Debug('Currency Controller:');
 
 ///////// helper functions
 async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
-  // transaction
-  // let[nr,user]=null;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -75,19 +73,19 @@ async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
     throw error; // Rethrow so calling function sees error
   }
 }
-async function exchangerewardToMoneyHelper(userId, reward) {
+async function exchangeRewardToMoneyHelper(userId) {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const opts = { session };
-    const toPay = new ToPay({ user: userId, amount: reward * REWARD_PRICE });
     const user = await User.findById(userId);
-    if (user && user.reward < reward) {
+    if (user && user.reward < REWARD_TRESHOLD_TO_EXCHANGE) {
       throw 2;
     } // not enough reward
-    user.reward = user.reward - reward;
-    await user.save(opts);
+    const toPay = new ToPay({ user: userId, amount: user.reward });
     await toPay.save(opts);
+    user.reward = 0;
+    await user.save(opts);
 
     await session.commitTransaction();
     session.endSession();
@@ -195,18 +193,9 @@ export function exchangecouponToLeagueOppo(req, res) {
   // otherwise returns updated user and record
 }
 
-export function exchangerewardToMoney(req, res) {
-  const reward = parseInt(req.params.reward);
+export function exchangeRewardToMoney(req, res) {
   try {
-    if (isNaN(reward) || reward <= 0) {
-      return res.sendStatus(400);
-    }
-    if (reward < REWARD_TRESHOLD_TO_EXCHANGE) {
-      return res.status(400).send({
-        code: 1
-      });
-    } // Less than treshold for exchange. somehow is the client mistake.
-    exchangerewardToMoneyHelper(req.userId, reward)
+    exchangeRewardToMoneyHelper(req.userId)
       .then(result => {
         res.status(200).send(result.toString());
       })
