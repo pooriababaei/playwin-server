@@ -1,5 +1,4 @@
-import { check, body, param, validationResult } from 'express-validator';
-
-export function createLeague(req, res, next) {}
-export function getAuthCodeValidator(req, res, next) {}
-export function authValidator(req, res, next) {}
+export function getLeagueValidator(req, res, next) {}
+export function createLeagueValidator(req, res, next) {}
+export function updateLeagueValidator(req, res, next) {}
+export function deleteLeagueValidator(req, res, next) {}

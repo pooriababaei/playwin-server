@@ -1,12 +1,12 @@
-import cryptoRandomString from "crypto-random-string";
-import Debug from "debug";
-import mongoose from "mongoose";
-import _ from "underscore";
-import { sendSMS } from "../utils/sms";
-import { INVITE_REWARD } from "../utils/globals";
-const debug = Debug("UserAuth Controller:");
-import User from "../db/models/user";
-import Auth from "../db/models/auth";
+import cryptoRandomString from 'crypto-random-string';
+import Debug from 'debug';
+import mongoose from 'mongoose';
+import _ from 'underscore';
+import { sendSMS } from '../utils/sms';
+import { INVITE_REWARD } from '../utils/globals';
+const debug = Debug('UserAuth Controller:');
+import User from '../db/models/user';
+import Auth from '../db/models/auth';
 
 export function getAuthCode(req, res) {
   const info = {
@@ -16,7 +16,7 @@ export function getAuthCode(req, res) {
   const auth = new Auth(info);
   if (
     (info.phoneNumber.length === 10 || info.phoneNumber.length === 11) &&
-    info.phoneNumber.match("0{0,1}9[0-9]{9}$")
+    info.phoneNumber.match('0{0,1}9[0-9]{9}$')
   ) {
     auth.save((err, auth) => {
       if (err) {
@@ -72,12 +72,12 @@ export function checkUniqueUsername(req, res) {
 }
 
 export async function signup(req, res) {
-  const info = _.pick(req.body, "username", "phoneNumber", "avatar");
+  const info = _.pick(req.body, 'username', 'phoneNumber', 'avatar');
   if (!req.body.username) {
     let username = null;
     let user = null;
     do {
-      username = cryptoRandomString({ length: 7, type: "base64" });
+      username = cryptoRandomString({ length: 7, type: 'base64' });
       user = await User.findOne({ username }).catch(() => res.sendStatus(500));
       info.username = username;
     } while (user);

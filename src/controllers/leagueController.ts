@@ -144,7 +144,7 @@ export async function getLeague(req, res) {
 }
 
 export async function createLeague(req, res) {
-  let images = [];
+  const images = [];
   let mainImage;
   let gif;
   let game;

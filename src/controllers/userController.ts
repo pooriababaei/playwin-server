@@ -1,15 +1,15 @@
-import Debug from "debug";
-import _ from "underscore";
-import { ADVERTISE_REWARD_COUPON, NEWEST_APP_VERSION } from "../utils/globals";
-import User from "../db/models/user";
-const debug = Debug("User Controller:");
+import Debug from 'debug';
+import _ from 'underscore';
+import { ADVERTISE_REWARD_COUPON, NEWEST_APP_VERSION } from '../utils/globals';
+import User from '../db/models/user';
+const debug = Debug('User Controller:');
 
 export function checkNewVersion(req, res) {
   if (req.params.version < NEWEST_APP_VERSION) {
     // there is a new version
     return res.status(200).json({
       code: 1,
-      path: ""
+      path: ''
     });
   }
   return res.status(200).json({
@@ -46,14 +46,14 @@ export async function getUsers(req, res) {
   if (filter && filter.username) {
     query.find({
       username: {
-        $regex: ".*" + filter.username + ".*"
+        $regex: '.*' + filter.username + '.*'
       }
     });
   }
   if (filter && filter.phoneNumber) {
     query.find({
       phoneNumber: {
-        $regex: ".*" + filter.phoneNumber + ".*"
+        $regex: '.*' + filter.phoneNumber + '.*'
       }
     });
   }
@@ -73,8 +73,8 @@ export async function getUsers(req, res) {
       }
       return res
         .set({
-          "Access-Control-Expose-Headers": "x-total-count",
-          "x-total-count": count
+          'Access-Control-Expose-Headers': 'x-total-count',
+          'x-total-count': count
         })
         .status(200)
         .json(users);
@@ -83,17 +83,13 @@ export async function getUsers(req, res) {
 
 export function updateUser(req, res) {
   // need to be checked
-  const extraCoupon = req.query.extraCoupon;
-  const info = _.pick(req.body, "avatar", "account");
+  const info = _.pick(req.body, 'username', 'avatar', 'account');
   User.findOneAndUpdate(
     {
       _id: req.userId
     },
     {
-      ...info,
-      $inc: {
-        coupon: extraCoupon === "true" ? ADVERTISE_REWARD_COUPON : 0
-      }
+      ...info
     },
     {
       new: true
@@ -126,7 +122,7 @@ export function usersCount(req, res) {
 
 export function introduceInviter(req, res) {
   const inviterUsername = req.params.inviter;
-  if (inviterUsername && typeof inviterUsername === "string") {
+  if (inviterUsername && typeof inviterUsername === 'string') {
     if (req.username === inviterUsername) {
       return res.sendStatus(400);
     }

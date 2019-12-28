@@ -1,5 +1,4 @@
-import { check, body, param, validationResult } from 'express-validator';
-
-export function createLeague(req, res, next) {}
-export function getAuthCodeValidator(req, res, next) {}
-export function authValidator(req, res, next) {}
+export function exchangeCouponToLeagueOppoValidator(req, res, next) {}
+export function exchangeRewardToMoney(req, res, next) {}
+export function giveRewardsValidator(req, res, next) {}
+export function achieve(req, res, next) {}
