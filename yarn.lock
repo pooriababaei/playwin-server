@@ -202,6 +202,11 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/hapi__joi@^16.0.5":
+  version "16.0.5"
+  resolved "https://registry.yarnpkg.com/@types/hapi__joi/-/hapi__joi-16.0.5.tgz#8dd7143be3cc472d7a553514719acf8ecf237478"
+  integrity sha512-S4nI6xEl68ULkzxLkPYlPQgOxIv5FXhrb4A3TgBADYU/JBVfpXt8DwVWgkgYeX3h7S/wbVsNOsUONkcE3LwpqQ==
+
 "@types/mime@*":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.1.tgz#dc488842312a7f075149312905b5e3c0b054c79d"

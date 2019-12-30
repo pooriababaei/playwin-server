@@ -177,6 +177,8 @@ export function exchangecouponToLeagueOppo(req, res) {
   const league = req.league;
   const oppo = req.params.opportunity;
 
+  if (!oppo || oppo === 0) return res.sendStatus(400);
+
   exchangecouponToLeagueOppoHelper(req.userId, oppo, league)
     .then(result => {
       res.status(200).json(result);

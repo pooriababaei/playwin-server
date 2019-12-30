@@ -14,7 +14,7 @@ import Job from '../db/models/job';
 const debug = Debug('League Controller:');
 
 export async function getLeagues(req, res) {
-  let leagueState: any = {};
+  const leagueState: any = {};
 
   let sort = null;
   let filter = null;
@@ -55,7 +55,7 @@ export async function getLeagues(req, res) {
     leagueState.kind = filter.kind;
   }
 
-  let query = League.find(leagueState);
+  const query = League.find(leagueState);
   if (sort) {
     query.sort([sort]);
   }
@@ -106,7 +106,7 @@ export async function getLeague(req, res) {
   // const validId = mongoose.Types.ObjectId(req.params.id);
   // console.log(validId);
   try {
-    let league = await League.findById(req.params.id).lean();
+    const league = await League.findById(req.params.id).lean();
     if (!league) {
       return res.sendStatus(404);
     }
@@ -114,7 +114,7 @@ export async function getLeague(req, res) {
       league.startTime < Date.now() &&
       mongoose.modelNames().includes(league.collectionName)
     ) {
-      const Scoreboard = mongoose.model(league.collectionName);
+      const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
         .limit(league.leadersNumber)
@@ -189,7 +189,7 @@ export async function createLeague(req, res) {
   }
 
   if (req.files && req.files.game) {
-    let zip = new AdmZip(
+    const zip = new AdmZip(
       path.join(
         __dirname,
         '../../public/leagues/',
@@ -255,7 +255,7 @@ export async function createLeague(req, res) {
 }
 
 export async function updateLeague(req, res) {
-  let images = [];
+  const images = [];
   let mainImage;
   let gif;
   let game;
@@ -301,7 +301,7 @@ export async function updateLeague(req, res) {
   }
 
   if (req.files && req.files.game) {
-    let zip = new AdmZip(
+    const zip = new AdmZip(
       path.join(
         __dirname,
         '../../public/leagues/',
@@ -334,7 +334,7 @@ export async function updateLeague(req, res) {
 
   if (req.files && req.files.images) {
     for (let i = 0; i < req.files.images.length; i++) {
-      let temp =
+      const temp =
         '/public/leagues/' +
         req.body.collectionName +
         '/images/' +
