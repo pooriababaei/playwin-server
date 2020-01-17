@@ -15,10 +15,9 @@ router.get('/:collectionName', isUserOrAdmin, scoreboardController.getRecords);
 router.get(
   '/modifyScoreboard/:collectionName/:type',
   isUser,
-  isApp,
   isLeagueUp,
   scoreboardController.modifyScoreboard
-);
+); // isApp
 router.get(
   '/userRecord/:collectionName',
   isUser,

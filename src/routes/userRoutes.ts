@@ -7,8 +7,8 @@ import { isAdmin, isApp, isUser, isUserOrAdmin } from '../utils/middlewares';
 const debug = Debug('User Route:');
 
 router.get('/checkNewVersion/:version', isUser, userController.checkNewVersion);
-router.get('/getAuthCode/:phoneNumber', isApp, userAuthController.getAuthCode);
-router.get('/auth/:phoneNumber/:token', isApp, userAuthController.auth);
+router.get('/getAuthCode/:phoneNumber', userAuthController.getAuthCode); // isApp
+router.get('/auth/:phoneNumber/:token', userAuthController.auth); // isApp
 router.get(
   '/checkUniqueUsername/:username',
   userAuthController.checkUniqueUsername
