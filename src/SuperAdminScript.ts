@@ -20,7 +20,10 @@ mongoose
     keepAlive: true,
     keepAliveInitialDelay: 300000,
     replicaSet: 'rs0',
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    user: 'admin',
+    pass: 'Playwin@2019',
+    authSource: 'admin'
   })
   .then(() => {
     League.find((err, leagues) => {
