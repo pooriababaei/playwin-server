@@ -19,11 +19,11 @@ router.get(
 router
   .route('/')
   .get(isUserOrAdmin, boxController.getBoxes)
-  .post(isAdmin, boxUpload, boxController.createBox);
+  .post(isAdmin, boxController.createBox);
 router
   .route('/:id')
   .get(isUserOrAdmin, boxController.getBox)
-  .put(isAdmin, boxUpload, boxController.updateBox)
+  .put(isAdmin, boxController.updateBox)
   .delete(isAdmin, boxController.deleteBox);
 
 export default router;

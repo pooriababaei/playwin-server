@@ -1,7 +1,7 @@
-import _ from "underscore";
-import Box from "../db/models/boxPurchase";
-import Debug from "debug";
-const debug = Debug("Box Controller:");
+import _ from 'underscore';
+import Box from '../db/models/box';
+import Debug from 'debug';
+const debug = Debug('Box Controller:');
 
 export function getBox(req, res) {
   Box.findById(req.params.id, (err, result) => {
@@ -19,8 +19,8 @@ export function getBoxes(req, res) {
     }
     return res
       .set({
-        "Access-Control-Expose-Headers": "x-total-count",
-        "x-total-count": result.length
+        'Access-Control-Expose-Headers': 'x-total-count',
+        'x-total-count': result.length
       })
       .status(200)
       .send(result);
@@ -30,12 +30,11 @@ export function getBoxes(req, res) {
 export function createBox(req, res) {
   const info = _.pick(
     req.body,
-    "name",
-    "type",
-    "price",
-    "offPrice",
-    "coupon",
-    "endTime"
+    'type',
+    'price',
+    'offPrice',
+    'coupon',
+    'endTime'
   );
   const box = new Box(info);
   box.save((err, box) => {
@@ -53,12 +52,11 @@ export function createBox(req, res) {
 export function updateBox(req, res) {
   const info = _.pick(
     req.body,
-    "name",
-    "type",
-    "price",
-    "offPrice",
-    "coupon",
-    "endTime"
+    'type',
+    'price',
+    'offPrice',
+    'coupon',
+    'endTime'
   );
   Box.findOneAndUpdate(
     { _id: req.params.id },

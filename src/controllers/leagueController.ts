@@ -168,7 +168,7 @@ export async function createLeague(req, res) {
     'reward',
     'loyaltyReward'
   );
-  info.defaultOpportunity = info.defaultOpportunity - 1;
+  // info.defaultOpportunity = info.defaultOpportunity - 1;
 
   if (req.files && req.files.mainImage) {
     mainImage =
@@ -236,7 +236,7 @@ export async function createLeague(req, res) {
   if (!league) {
     return res.sendStatus(400);
   }
-  scoreboardModel(league.collectionName, league.defaultOpportunity);
+  scoreboardModel(league.collectionName, league.defaultOpportunity - 1);
   const job = {
     property: league.collectionName,
     type: 'reward',
@@ -278,9 +278,9 @@ export async function updateLeague(req, res) {
     'reward',
     'loyaltyReward'
   );
-  if (info.defaultOpportunity) {
-    info.defaultOpportunity = info.defaultOpportunity - 1;
-  }
+  // if (info.defaultOpportunity) {
+  //   info.defaultOpportunity = info.defaultOpportunity - 1;
+  // }
 
   if (req.files && req.files.mainImage) {
     mainImage =
