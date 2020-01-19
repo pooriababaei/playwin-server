@@ -96,7 +96,7 @@ export function updateUser(req, res) {
     },
     (err, user) => {
       if (err) {
-        res.sendStatus(500);
+        res.sendStatus(400);
       } else if (!user) {
         res.sendStatus(404);
       } else {
