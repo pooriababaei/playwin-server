@@ -83,6 +83,7 @@ export async function getUsers(req, res) {
 
 export function updateUser(req, res) {
   // need to be checked
+  console.log('hello here');
   const info = _.pick(req.body, 'username', 'avatar', 'account');
   User.findOneAndUpdate(
     {

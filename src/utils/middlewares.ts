@@ -1,32 +1,32 @@
-import CryptoJS from "crypto-js";
-import Debug from "debug";
-import fs from "fs";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-import path from "path";
-import League from "../db/models/league";
+import CryptoJS from 'crypto-js';
+import Debug from 'debug';
+import fs from 'fs';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import path from 'path';
+import League from '../db/models/league';
 //const user_key = fs.readFileSync(path.join(__dirname, '../keys/user_key')).toString();
 //const admin_key = fs.readFileSync(path.join(__dirname, '../keys/admin_key')).toString();
 //const app_key = fs.readFileSync(path.join(__dirname, '../keys/app_key')).toString();
-const debug = Debug("Middleware:");
+const debug = Debug('Middleware:');
 
 export const isUser = (req, res, next) => {
   if (req.headers.authorization == null) {
     return res.sendStatus(401);
   }
-  const authArray = req.headers.authorization.toString().split(" ");
+  const authArray = req.headers.authorization.toString().split(' ');
   if (authArray.length !== 2) {
     return res.sendStatus(401);
   }
   const bearer = authArray[0];
   const token = authArray[1];
 
-  if (bearer === "Bearer" && token) {
+  if (bearer === 'Bearer' && token) {
     jwt.verify(token, process.env.USER_KEY, (err, decoded) => {
       if (err) {
         return res.sendStatus(401);
       }
-      if (decoded && decoded.role && decoded.role === "user") {
+      if (decoded && decoded.role && decoded.role === 'user') {
         req.userId = decoded._id;
         req.username = decoded.username;
         req.phoneNumber = decoded.phoneNumber;
@@ -44,14 +44,14 @@ export const isAdmin = (req, res, next) => {
   if (req.headers.authorization == null) {
     return res.sendStatus(401);
   }
-  const authArray = req.headers.authorization.toString().split(" ");
+  const authArray = req.headers.authorization.toString().split(' ');
   if (authArray.length !== 2) {
     return res.sendStatus(401);
   }
   const bearer = authArray[0];
   const token = authArray[1];
 
-  if (bearer === "Bearer" && token) {
+  if (bearer === 'Bearer' && token) {
     jwt.verify(token, process.env.ADMIN_KEY, function(err, decoded) {
       if (err) {
         return res.send(401).send();
@@ -59,7 +59,7 @@ export const isAdmin = (req, res, next) => {
       if (
         decoded &&
         decoded.role &&
-        (decoded.role === "admin" || decoded.role === "superadmin")
+        (decoded.role === 'admin' || decoded.role === 'superadmin')
       ) {
         req.adminId = decoded._id;
         req.email = decoded.email;
@@ -78,19 +78,19 @@ export const isSuperAdmin = (req, res, next) => {
   if (req.headers.authorization == null) {
     return res.sendStatus(401);
   }
-  const authArray = req.headers.authorization.toString().split(" ");
+  const authArray = req.headers.authorization.toString().split(' ');
   if (authArray.length !== 2) {
     return res.sendStatus(401);
   }
   const bearer = authArray[0];
   const token = authArray[1];
 
-  if (bearer === "Bearer" && token) {
+  if (bearer === 'Bearer' && token) {
     jwt.verify(token, process.env.ADMIN_KEY, (err, decoded) => {
       if (err) {
         return res.send(401).send();
       }
-      if (decoded && decoded.role && decoded.role === "superadmin") {
+      if (decoded && decoded.role && decoded.role === 'superadmin') {
         req.adminId = decoded._id;
         req.email = decoded.email;
         req.username = decoded.username;
@@ -108,16 +108,16 @@ export const isUserOrAdmin = (req, res, next) => {
   if (req.headers.authorization == null) {
     return res.sendStatus(401);
   }
-  const authArray = req.headers.authorization.toString().split(" ");
+  const authArray = req.headers.authorization.toString().split(' ');
   if (authArray.length !== 2) {
     return res.sendStatus(401);
   }
   const bearer = authArray[0];
   const token = authArray[1];
 
-  if (bearer === "Bearer" && token) {
+  if (bearer === 'Bearer' && token) {
     jwt.verify(token, process.env.USER_KEY, (err, decoded) => {
-      if (decoded && decoded.role && decoded.role === "user") {
+      if (decoded && decoded.role && decoded.role === 'user') {
         req.userId = decoded._id;
         req.phoneNumber = decoded.phoneNumber;
         next();
@@ -126,7 +126,7 @@ export const isUserOrAdmin = (req, res, next) => {
           if (
             decoded &&
             decoded.role &&
-            (decoded.role === "admin" || decoded.role === "superadmin")
+            (decoded.role === 'admin' || decoded.role === 'superadmin')
           ) {
             req.adminId = decoded._id;
             req.email = decoded.email;
@@ -142,9 +142,10 @@ export const isUserOrAdmin = (req, res, next) => {
 
 export const isApp = (req, res, next) => {
   try {
-    if (req.headers["content-size"] == null) {
+    if (req.headers['content-size'] == null) {
       return res.sendStatus(401);
     }
+    console.log(req.phoneNumber);
     let phone = null;
     if (req.phoneNumber) {
       phone = req.phoneNumber;
@@ -154,10 +155,10 @@ export const isApp = (req, res, next) => {
       return res.sendStatus(401);
     }
     const bytes = CryptoJS.AES.decrypt(
-      req.headers["content-size"],
+      req.headers['content-size'],
       process.env.APP_KEY + phone
     );
-    if (bytes.toString() !== "") {
+    if (bytes.toString() !== '') {
       const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
       if (decryptedData.score) {
         req.score = decryptedData.score;

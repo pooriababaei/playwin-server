@@ -421,6 +421,7 @@ export function getUserRecord(req, res) {
       } else if (result) {
         return res.status(200).send(result);
       } else {
+        console.log('wtf');
         return res.status(404).send();
       }
     });
