@@ -11,7 +11,7 @@ const router = express.Router();
 const debug = Debug('Currency Route:');
 
 router.get(
-  '/exchangecouponToLeagueOppo/:collectionName/:opportunity/',
+  '/exchangeCouponToLeagueOppo/:collectionName/:opportunity/',
   isUser,
   isLeagueUp,
   currencyController.exchangecouponToLeagueOppo

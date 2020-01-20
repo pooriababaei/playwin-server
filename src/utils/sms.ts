@@ -5,9 +5,12 @@ import request from 'request';
 
 export function sendSMS(phone, code) {
   const kavenegar = Kavenegar.KavenegarApi({
-    apikey: '724658576A51787A35486A4C7546714A534F376A4A433856495372384A5A3673'
+    // apikey: '724658576A51787A35486A4C7546714A534F376A4A433856495372384A5A3673' // Pooria
+    apikey:
+      '7341483264363438453031555343314A3934554972735A5943463233493768467174613535676F475161673D'
   });
   kavenegar.Send({
+    //  message: `کد فعال سازی شما در پلی وین: ${code}`,
     message: `کد فعال سازی شما در پلی وین: ${code}`,
     receptor: phone
   });
