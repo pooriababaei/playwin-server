@@ -145,7 +145,6 @@ export const isApp = (req, res, next) => {
     if (req.headers['content-size'] == null) {
       return res.sendStatus(401);
     }
-    console.log(req.phoneNumber);
     let phone = null;
     if (req.phoneNumber) {
       phone = req.phoneNumber;
