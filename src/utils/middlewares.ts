@@ -54,7 +54,7 @@ export const isAdmin = (req, res, next) => {
   if (bearer === 'Bearer' && token) {
     jwt.verify(token, process.env.ADMIN_KEY, function(err, decoded) {
       if (err) {
-        return res.send(401).send();
+        return res.sendStatus(401);
       }
       if (
         decoded &&
@@ -66,11 +66,11 @@ export const isAdmin = (req, res, next) => {
         req.username = decoded.username;
         next();
       } else {
-        return res.status(401).send();
+        return res.sendtatus(401);
       }
     });
   } else {
-    return res.status(401).send();
+    return res.sendStatus(401);
   }
 };
 

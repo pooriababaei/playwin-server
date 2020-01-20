@@ -403,6 +403,7 @@ export function modifyScoreboard(req, res) {
 }
 
 export function getUserRecord(req, res) {
+  console.log(mongoose.modelNames());
   if (mongoose.modelNames().indexOf(req.params.collectionName) < 0) {
     return res.sendStatus(404);
   }
@@ -421,7 +422,6 @@ export function getUserRecord(req, res) {
       } else if (result) {
         return res.status(200).send(result);
       } else {
-        console.log('wtf');
         return res.status(404).send();
       }
     });
