@@ -90,6 +90,10 @@ export async function getLeagues(req, res) {
       else if (league.leadersNumber !== 0)
         league.leadersAveragePlayedTimes = sum / league.leadersNumber;
       else league.leadersAveragePlayedTimes = 0;
+
+      league.leadersAveragePlayedTimes = Math.floor(
+        league.leadersAveragePlayedTimes
+      );
     }
   }
 
