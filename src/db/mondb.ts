@@ -41,7 +41,7 @@ mongoose
       }
       if (!err) {
         leagues.forEach(item => {
-          scoreboardModel(item.collectionName, item.defaultOpportunity);
+          scoreboardModel(item.collectionName, item.defaultOpportunity - 1);
         });
       }
       debug('database connected :)');
