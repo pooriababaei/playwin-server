@@ -117,12 +117,17 @@ export async function giveRewardsHelper(collectionName) {
     for (const record of rewardUsers) {
       await User.findOneAndUpdate(
         { _id: record.user },
-        { $inc: { reward: league.reward, totalReward: league.reward } },
+        {
+          $inc: {
+            reward: league.reward / league.leadersNumber,
+            totalReward: league.reward
+          }
+        },
         opts
       );
       const wl = new WeeklyLeader({
         user: record.user,
-        reward: league.reward
+        reward: league.reward / league.leadersNumber
       });
       await wl.save().catch(() => {}); // not so important to impact transaction
     }
