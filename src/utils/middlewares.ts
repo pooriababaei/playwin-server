@@ -1,13 +1,9 @@
 import CryptoJS from 'crypto-js';
 import Debug from 'debug';
-import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import path from 'path';
 import League from '../db/models/league';
-//const user_key = fs.readFileSync(path.join(__dirname, '../keys/user_key')).toString();
-//const admin_key = fs.readFileSync(path.join(__dirname, '../keys/admin_key')).toString();
-//const app_key = fs.readFileSync(path.join(__dirname, '../keys/app_key')).toString();
+
 const debug = Debug('Middleware:');
 
 export const isUser = (req, res, next) => {
@@ -167,6 +163,37 @@ export const isApp = (req, res, next) => {
       return res.sendStatus(401);
     }
   } catch (err) {
+    return res.sendStatus(401);
+  }
+};
+
+export const isPublisher = (req, res, next) => {
+  if (req.headers.authorization == null) {
+    return res.sendStatus(401);
+  }
+  const authArray = req.headers.authorization.toString().split(' ');
+  if (authArray.length !== 2) {
+    return res.sendStatus(401);
+  }
+  const bearer = authArray[0];
+  const token = authArray[1];
+
+  if (bearer === 'Bearer' && token) {
+    jwt.verify(token, process.env.PUBLISHER_KEY, function(err, decoded) {
+      if (err) {
+        return res.sendStatus(401);
+      }
+      if (decoded && decoded.role) {
+        req.publisherId = decoded._id;
+        req.email = decoded.email;
+        req.username = decoded.username;
+        req.gameId = decoded.gameId;
+        next();
+      } else {
+        return res.sendtatus(401);
+      }
+    });
+  } else {
     return res.sendStatus(401);
   }
 };

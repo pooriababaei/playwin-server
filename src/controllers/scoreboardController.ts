@@ -505,6 +505,7 @@ export async function getRecords(req, res) {
 
 export async function getWeeklyLeaders(req, res) {
   const pipeline = [
+    { $match: { score: { $gt: 0 } } },
     {
       $group: {
         _id: '$user',

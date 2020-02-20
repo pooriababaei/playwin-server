@@ -1,5 +1,5 @@
 import { Model, model, Schema } from 'mongoose';
-import { Game } from '../../interfaces/game';
+import { ThirdGame } from '../../interfaces/thirdGame';
 const gameSchema = new Schema(
   {
     name: { type: String, minLength: 3, required: true },
@@ -8,20 +8,15 @@ const gameSchema = new Schema(
 
     available: { type: Boolean, default: false },
 
-    images: [{ type: String }],
-
     mainImage: { type: String, required: true },
 
-    html: { type: String, default: '/index.html' },
-
-    game: { type: String },
-
-    gameZip: { type: String },
-
-    color: { type: String }
+    link: { type: String }
   },
   { versionKey: false }
 );
 
-const gameModel: Model<Game> = model<Game>('game', gameSchema);
-export default gameModel;
+const thirdGameModel: Model<ThirdGame> = model<ThirdGame>(
+  'thirdGame',
+  gameSchema
+);
+export default thirdGameModel;

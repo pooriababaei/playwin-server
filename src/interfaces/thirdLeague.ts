@@ -1,0 +1,16 @@
+import { Document, Types } from 'mongoose';
+
+export interface ThirdLeague extends Document {
+  _id: Types.ObjectId;
+  game: Types.ObjectId;
+  collectionName: string;
+  description: string;
+  leadersNumber: number;
+  reward: number;
+  rewarded: boolean;
+  defaultOpportunity: number;
+  maxOpportunity: number;
+  startTime: Date;
+  endTime: Date;
+  available: boolean;
+}

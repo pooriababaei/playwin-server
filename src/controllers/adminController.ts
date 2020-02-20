@@ -1,8 +1,8 @@
-import _ from "underscore";
-import Admin from "../db/models/admin";
-import bcrypt from "bcryptjs";
-import Debug from "debug";
-const debug = Debug("Admin Controller:");
+import _ from 'underscore';
+import Admin from '../db/models/admin';
+import bcrypt from 'bcryptjs';
+import Debug from 'debug';
+const debug = Debug('Admin Controller:');
 
 export function getAdmin(req, res) {
   Admin.findById(req.params.id, (err, result) => {
@@ -20,8 +20,8 @@ export function getAdmins(req, res) {
     }
     return res
       .set({
-        "Access-Control-Expose-Headers": "x-total-count",
-        "x-total-count": result.length
+        'Access-Control-Expose-Headers': 'x-total-count',
+        'x-total-count': result.length
       })
       .status(200)
       .send(result);
@@ -31,12 +31,12 @@ export function getAdmins(req, res) {
 export function createAdmin(req, res) {
   const info = _.pick(
     req.body,
-    "name",
-    "username",
-    "phone",
-    "password",
-    "email",
-    "role"
+    'name',
+    'username',
+    'phone',
+    'password',
+    'email',
+    'role'
   );
   const admin = new Admin(info);
   admin.save((err, admin) => {
@@ -50,12 +50,12 @@ export function createAdmin(req, res) {
 export function updateAdmin(req, res) {
   const info = _.pick(
     req.body,
-    "name",
-    "username",
-    "phone",
-    "password",
-    "email",
-    "role"
+    'name',
+    'username',
+    'phone',
+    'password',
+    'email',
+    'role'
   );
   if (info.password) {
     const salt = bcrypt.genSaltSync(10);

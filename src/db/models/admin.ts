@@ -1,10 +1,7 @@
-import bcrypt from "bcryptjs";
-import fs from "fs";
-import jwt from "jsonwebtoken";
-import { Admin } from "../../interfaces/admin";
-import { model, Model, Schema } from "mongoose";
-import path from "path";
-import { promises } from "dns";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Admin } from '../../interfaces/admin';
+import { model, Model, Schema } from 'mongoose';
 const adminSchema = new Schema(
   {
     username: {
@@ -33,12 +30,16 @@ const adminSchema = new Schema(
 
     resetPasswordExpires: { type: Date },
 
-    role: { type: String, enum: ["admin", "superadmin"], default: "admin" }
+    role: {
+      type: String,
+      enum: ['admin', 'superadmin'],
+      default: 'admin'
+    }
   },
   {
     timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt"
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt'
     },
     versionKey: false
   }
@@ -102,9 +103,9 @@ adminSchema.statics.findByEmail = function(email, password) {
   });
 };
 
-adminSchema.pre<Admin>("save", function(next) {
+adminSchema.pre<Admin>('save', function(next) {
   const admin = this;
-  if (admin.isModified("password")) {
+  if (admin.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(admin.password, salt, (err, hash) => {
         admin.password = hash;
@@ -116,7 +117,7 @@ adminSchema.pre<Admin>("save", function(next) {
   }
 });
 
-adminSchema.virtual("id").get(function() {
+adminSchema.virtual('id').get(function() {
   return this._id;
 });
 
@@ -124,6 +125,6 @@ interface AdminModel extends Model<Admin> {
   findByUsername: (username: string, password: string) => any;
   findByEmail: (email: string, password: string) => any;
 }
-const adminModel: AdminModel = model<Admin, AdminModel>("admin", adminSchema);
+const adminModel: AdminModel = model<Admin, AdminModel>('admin', adminSchema);
 
 export default adminModel;

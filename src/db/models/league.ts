@@ -1,5 +1,5 @@
-import { Model, model, Schema } from "mongoose";
-import { League } from "../../interfaces/league";
+import { Model, model, Schema } from 'mongoose';
+import { League } from '../../interfaces/league';
 const leagueSchema = new Schema(
   {
     name: { type: String, minLength: 3, required: true },
@@ -26,19 +26,17 @@ const leagueSchema = new Schema(
 
     startTime: { type: Date, required: true },
 
-    endTime: { type: Date },
+    endTime: { type: Date, required: true },
 
     game: { type: String },
 
     available: { type: Boolean, default: false }, // available to users
 
-    gameHidden: { type: Boolean, default: false },
-
     images: [{ type: String }],
 
     mainImage: { type: String, required: true },
 
-    html: { type: String, default: "/index.html" },
+    html: { type: String, default: '/index.html' },
 
     gameZip: { type: String },
 
@@ -47,5 +45,5 @@ const leagueSchema = new Schema(
   { versionKey: false }
 );
 
-const leagueModel: Model<League> = model<League>("league", leagueSchema);
+const leagueModel: Model<League> = model<League>('league', leagueSchema);
 export default leagueModel;

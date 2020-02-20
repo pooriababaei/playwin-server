@@ -16,6 +16,7 @@ import './models/boxPurchase';
 import './models/game';
 import './models/job';
 import './models/league';
+import './models/thirdLeague';
 import { scoreboardModel } from './models/scoreboard';
 import './models/toPay';
 import './models/user';
