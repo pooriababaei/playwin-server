@@ -550,7 +550,7 @@ export async function getWeeklyLeaders(req, res) {
 }
 
 export async function getTopUsers(req, res) {
-  User.find({}, 'avatar username totalReward')
+  User.find({ totalReward: { $gt: 0 } }, 'avatar username totalReward')
     .limit(100)
     .skip(0)
     .sort({ totalReward: -1 })
