@@ -66,6 +66,7 @@ async function surroundingUsersHelper(league, userId, limit) {
   for (let i = 0; i < page.length; i++) {
     page[i].rank = rank + (i - userIndex);
   }
+
   return page;
 }
 async function userRankHelper(league, userId) {
