@@ -106,7 +106,7 @@ export async function getLeague(req, res) {
     if (!league) {
       return res.sendStatus(404);
     }
-    if (league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
+    if (league.startTime < new Date() && mongoose.modelNames().includes(league.collectionName)) {
       const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
@@ -308,7 +308,7 @@ export async function updateLeague(req, res) {
   if (league && info.endTime) {
     const oldEndTime = new Date(league.endTime).getTime();
     const newEndTime = new Date(info.endTime).getTime();
-    if (oldEndTime === newEndTime || league.rewarded === true || league.endTime < Date.now()) {
+    if (oldEndTime === newEndTime || league.rewarded === true || league.endTime < new Date()) {
       shouldSchedule = false;
     }
   }
@@ -330,7 +330,7 @@ export async function updateLeague(req, res) {
         const job = {
           fireTime: new Date(league.endTime),
           processOwner:
-            process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null,
+            process.env.NODE_APP_INSTANCE != null ? +process.env.NODE_APP_INSTANCE : null,
         };
         Job.findOneAndUpdate(
           {

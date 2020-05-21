@@ -76,7 +76,7 @@ export async function updateLeague(req, res) {
     if (league && info.endTime) {
       const oldEndTime = new Date(league.endTime).getTime();
       const newEndTime = new Date(info.endTime).getTime();
-      if (oldEndTime === newEndTime || league.rewarded === true || league.endTime < Date.now()) {
+      if (oldEndTime === newEndTime || league.rewarded === true || league.endTime < new Date()) {
         shouldSchedule = false;
       }
     }

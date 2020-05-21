@@ -8,4 +8,5 @@ export interface Scoreboard extends Document {
   played: number;
   createdAt: Date;
   updatedAt: Date;
+  rank?: number;
 }

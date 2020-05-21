@@ -1,9 +1,9 @@
-import { Document, Types } from "mongoose";
+import { Document, Types } from 'mongoose';
 
 export interface User extends Document {
   _id: Types.ObjectId;
   username: string;
-  invitingUsers: Types.ObjectId;
+  invitingUsers: Types.ObjectId[];
   reward: number;
   totalReward: number;
   coupon: number;
