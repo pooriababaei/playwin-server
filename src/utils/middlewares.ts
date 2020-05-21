@@ -48,15 +48,11 @@ export const isAdmin = (req, res, next) => {
   const token = authArray[1];
 
   if (bearer === 'Bearer' && token) {
-    jwt.verify(token, process.env.ADMIN_KEY, function(err, decoded) {
+    jwt.verify(token, process.env.ADMIN_KEY, function (err, decoded) {
       if (err) {
         return res.sendStatus(401);
       }
-      if (
-        decoded &&
-        decoded.role &&
-        (decoded.role === 'admin' || decoded.role === 'superadmin')
-      ) {
+      if (decoded && decoded.role && (decoded.role === 'admin' || decoded.role === 'superadmin')) {
         req.adminId = decoded._id;
         req.email = decoded.email;
         req.username = decoded.username;
@@ -136,6 +132,42 @@ export const isUserOrAdmin = (req, res, next) => {
   }
 };
 
+export const isPublisherOrAdmin = (req, res, next) => {
+  if (req.headers.authorization == null) {
+    return res.sendStatus(401);
+  }
+  const authArray = req.headers.authorization.toString().split(' ');
+  if (authArray.length !== 2) {
+    return res.sendStatus(401);
+  }
+  const bearer = authArray[0];
+  const token = authArray[1];
+
+  if (bearer === 'Bearer' && token) {
+    jwt.verify(token, process.env.PUBLISHER_KEY, (err, decoded) => {
+      if (decoded && decoded.role && decoded.role === 'user') {
+        req.publisherId = decoded._id;
+        req.email = decoded.email;
+        next();
+      } else {
+        jwt.verify(token, process.env.ADMIN_KEY, (err, decoded) => {
+          if (
+            decoded &&
+            decoded.role &&
+            (decoded.role === 'admin' || decoded.role === 'superadmin')
+          ) {
+            req.adminId = decoded._id;
+            req.email = decoded.email;
+            next();
+          } else {
+            return res.sendStatus(401);
+          }
+        });
+      }
+    });
+  }
+};
+
 export const isApp = (req, res, next) => {
   try {
     if (req.headers['content-size'] == null) {
@@ -149,10 +181,7 @@ export const isApp = (req, res, next) => {
     } else {
       return res.sendStatus(401);
     }
-    const bytes = CryptoJS.AES.decrypt(
-      req.headers['content-size'],
-      process.env.APP_KEY + phone
-    );
+    const bytes = CryptoJS.AES.decrypt(req.headers['content-size'], process.env.APP_KEY + phone);
     if (bytes.toString() !== '') {
       const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
       if (decryptedData.score) {
@@ -179,7 +208,7 @@ export const isPublisher = (req, res, next) => {
   const token = authArray[1];
 
   if (bearer === 'Bearer' && token) {
-    jwt.verify(token, process.env.PUBLISHER_KEY, function(err, decoded) {
+    jwt.verify(token, process.env.PUBLISHER_KEY, function (err, decoded) {
       if (err) {
         return res.sendStatus(401);
       }
@@ -210,7 +239,7 @@ export const isLeagueUp = (req, res, next) => {
   if (mongoose.modelNames().indexOf(league) > -1) {
     League.findOne(
       {
-        collectionName: league
+        collectionName: league,
       },
       (err, league) => {
         if (err) {
