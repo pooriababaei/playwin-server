@@ -1,7 +1,7 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { Model, model, Schema } from "mongoose";
-import { User } from "../../interfaces/user";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Model, model, Schema } from 'mongoose';
+import { User } from '../../interfaces/user';
 const userSchema: any = new Schema(
   {
     username: {
@@ -10,10 +10,10 @@ const userSchema: any = new Schema(
       unique: true,
       trim: true,
       set: toLower,
-      index: true
+      index: true,
     },
 
-    invitingUsers: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    invitingUsers: [{ type: Schema.Types.ObjectId, ref: 'user' }],
 
     reward: { type: Number, default: 0, index: true },
 
@@ -21,9 +21,9 @@ const userSchema: any = new Schema(
 
     coupon: { type: Number, default: 100 },
 
-    achievements: [{ type: Schema.Types.ObjectId, ref: "achievement" }],
+    achievements: [{ type: Schema.Types.ObjectId, ref: 'achievement' }],
 
-    participatedLeagues: [{ type: Schema.Types.ObjectId, ref: "league" }],
+    participatedLeagues: [{ type: Schema.Types.ObjectId, ref: 'league' }],
 
     phoneNumber: { type: String, required: true, unique: true, index: true },
 
@@ -31,16 +31,16 @@ const userSchema: any = new Schema(
 
     loyalty: { type: Number, default: 0, index: true },
 
-    avatar: { type: String, default: "0" },
+    avatar: { type: String, default: '0' },
 
-    appSource: { type: String } // each number for an app source like :bazaar , playStore,directP
+    appSource: { type: String }, // each number for an app source like :bazaar , playStore,directP
   },
   {
     timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt"
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt',
     },
-    versionKey: false
+    versionKey: false,
   }
 );
 userSchema.index({ createdAt: 1 });
@@ -48,7 +48,7 @@ function toLower(v) {
   return v.toLowerCase();
 }
 
-userSchema.methods.generateToken = function() {
+userSchema.methods.generateToken = function () {
   let user = this;
   return jwt
     .sign(
@@ -57,16 +57,16 @@ userSchema.methods.generateToken = function() {
         username: user.username,
         phoneNumber: user.phoneNumber,
         avatar: user.avatar,
-        role: "user"
+        role: 'user',
       },
       process.env.USER_KEY
     )
     .toString();
 };
 
-userSchema.statics.findByUsername = function(username, password) {
+userSchema.statics.findByUsername = function (username, password) {
   const User = this;
-  return User.findOne({ username }).then(user => {
+  return User.findOne({ username }).then((user) => {
     if (!user) {
       return Promise.reject();
     }
@@ -86,5 +86,5 @@ userSchema.statics.findByUsername = function(username, password) {
 interface UserModel extends Model<User> {
   fundByUsername: (username: string, password: string) => any;
 }
-const userModel: Model<User> = model<User>("user", userSchema);
+const userModel: UserModel = model<User, UserModel>('user', userSchema);
 export default userModel;

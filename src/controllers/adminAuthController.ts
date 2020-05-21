@@ -118,7 +118,7 @@ export function resetPassword(req, res) {
         Admin.findOne(
           {
             resetPasswordToken: req.params.token,
-            resetPasswordExpires: { $gt: Date.now() },
+            resetPasswordExpires: { $gt: new Date() },
           },
           (err, admin) => {
             if (!admin) {

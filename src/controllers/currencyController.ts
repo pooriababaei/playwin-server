@@ -106,7 +106,7 @@ export async function giveRewardsHelper(collectionName) {
     if (!league) {
       throw 404;
     }
-    if (league.endTime >= Date.now() || league.rewarded === true) {
+    if (league.endTime >= new Date() || league.rewarded === true) {
       throw 400;
     }
     const rewardUsers: any = await getRecordsHelper(league.collectionName, league.leadersNumber, 1);

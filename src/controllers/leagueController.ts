@@ -30,20 +30,20 @@ export async function getLeagues(req, res) {
     if (filter.running === 1) {
       // up leagues
       leagueState.endTime = {
-        $gte: Date.now()
+        $gte: Date.now(),
       };
       leagueState.startTime = {
-        $lte: Date.now()
+        $lte: Date.now(),
       };
     } else if (filter.running === 2) {
       // future leagues
       leagueState.startTime = {
-        $gt: Date.now()
+        $gt: Date.now(),
       };
     } else if (filter.running === 3) {
       // past leagues
       leagueState.endTime = {
-        $lt: Date.now()
+        $lt: Date.now(),
       };
     }
   }
@@ -64,10 +64,7 @@ export async function getLeagues(req, res) {
     return res.sendStatus(404);
   }
   for (const league of leagues) {
-    if (
-      league.startTime < Date.now() &&
-      mongoose.modelNames().includes(league.collectionName)
-    ) {
+    if (league.startTime < new Date() && mongoose.modelNames().includes(league.collectionName)) {
       const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
@@ -75,32 +72,27 @@ export async function getLeagues(req, res) {
         .skip(0)
         .sort({
           score: -1,
-          updatedAt: 1
+          updatedAt: 1,
         })
         .lean();
       let sum = 0;
       for (const record of leadersPlayedTimes) {
         sum += record.played;
       }
-      if (
-        league.playersNumber < league.leadersNumber &&
-        league.playersNumber !== 0
-      )
+      if (league.playersNumber < league.leadersNumber && league.playersNumber !== 0)
         league.leadersAveragePlayedTimes = sum / league.playersNumber;
       else if (league.leadersNumber !== 0)
         league.leadersAveragePlayedTimes = sum / league.leadersNumber;
       else league.leadersAveragePlayedTimes = 0;
 
-      league.leadersAveragePlayedTimes = Math.floor(
-        league.leadersAveragePlayedTimes
-      );
+      league.leadersAveragePlayedTimes = Math.floor(league.leadersAveragePlayedTimes);
     }
   }
 
   return res
     .set({
       'Access-Control-Expose-Headers': 'x-total-count',
-      'x-total-count': leagues.length
+      'x-total-count': leagues.length,
     })
     .status(200)
     .json(leagues);
@@ -114,10 +106,7 @@ export async function getLeague(req, res) {
     if (!league) {
       return res.sendStatus(404);
     }
-    if (
-      league.startTime < Date.now() &&
-      mongoose.modelNames().includes(league.collectionName)
-    ) {
+    if (league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
       const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
@@ -125,17 +114,14 @@ export async function getLeague(req, res) {
         .skip(0)
         .sort({
           score: -1,
-          updatedAt: 1
+          updatedAt: 1,
         })
         .lean();
       let sum = 0;
       for (const record of leadersPlayedTimes) {
         sum += record.played;
       }
-      if (
-        league.playersNumber < league.leadersNumber &&
-        league.playersNumber !== 0
-      )
+      if (league.playersNumber < league.leadersNumber && league.playersNumber !== 0)
         league.leadersAveragePlayedTimes = sum / league.playersNumber;
       else if (league.leadersNumber !== 0)
         league.leadersAveragePlayedTimes = sum / league.leadersNumber;
@@ -176,19 +162,12 @@ export async function createLeague(req, res) {
 
   if (req.files && req.files.mainImage) {
     mainImage =
-      '/public/leagues/' +
-      req.body.collectionName +
-      '/' +
-      req.files.mainImage[0].filename;
+      '/public/leagues/' + req.body.collectionName + '/' + req.files.mainImage[0].filename;
     info.mainImage = mainImage;
   }
 
   if (req.files && req.files.gif) {
-    gif =
-      '/public/leagues/' +
-      req.body.collectionName +
-      '/' +
-      req.files.gif[0].filename;
+    gif = '/public/leagues/' + req.body.collectionName + '/' + req.files.gif[0].filename;
     info.gif = gif;
   }
 
@@ -215,11 +194,7 @@ export async function createLeague(req, res) {
       req.files.game[0].originalname.split('.')[0],
       index
     );
-    gameZip = urljoin(
-      '/public/leagues',
-      req.body.collectionName,
-      req.files.game[0].originalname
-    );
+    gameZip = urljoin('/public/leagues', req.body.collectionName, req.files.game[0].originalname);
 
     info.game = game;
     info.gameZip = gameZip;
@@ -228,10 +203,7 @@ export async function createLeague(req, res) {
   if (req.files && req.files.images) {
     for (let i = 0; i < req.files.images.length; i++) {
       const temp =
-        '/public/leagues/' +
-        req.body.collectionName +
-        '/images/' +
-        req.files.images[i].filename;
+        '/public/leagues/' + req.body.collectionName + '/images/' + req.files.images[i].filename;
       images.push(temp);
     }
     info.images = images;
@@ -245,14 +217,11 @@ export async function createLeague(req, res) {
     property: league.collectionName,
     type: 'reward',
     fireTime: new Date(league.endTime),
-    processOwner:
-      process.env.NODE_APP_INSTANCE != null
-        ? process.env.NODE_APP_INSTANCE
-        : null
+    processOwner: process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null,
   };
   createJobHelper(job, giveRewardsHelper, true)
     .then(() => res.status(200).send(league))
-    .catch(err => {
+    .catch((err) => {
       debug(err);
       return res.sendStatus(500);
     });
@@ -288,19 +257,12 @@ export async function updateLeague(req, res) {
 
   if (req.files && req.files.mainImage) {
     mainImage =
-      '/public/leagues/' +
-      req.body.collectionName +
-      '/' +
-      req.files.mainImage[0].filename;
+      '/public/leagues/' + req.body.collectionName + '/' + req.files.mainImage[0].filename;
     info.mainImage = mainImage;
   }
 
   if (req.files && req.files.gif) {
-    gif =
-      '/public/leagues/' +
-      req.body.collectionName +
-      '/' +
-      req.files.gif[0].filename;
+    gif = '/public/leagues/' + req.body.collectionName + '/' + req.files.gif[0].filename;
     info.gif = gif;
   }
 
@@ -326,11 +288,7 @@ export async function updateLeague(req, res) {
       req.files.game[0].originalname.split('.')[0],
       index
     );
-    gameZip = urljoin(
-      '/public/leagues',
-      req.body.collectionName,
-      req.files.game[0].originalname
-    );
+    gameZip = urljoin('/public/leagues', req.body.collectionName, req.files.game[0].originalname);
 
     info.game = game;
     info.gameZip = gameZip;
@@ -339,10 +297,7 @@ export async function updateLeague(req, res) {
   if (req.files && req.files.images) {
     for (let i = 0; i < req.files.images.length; i++) {
       const temp =
-        '/public/leagues/' +
-        req.body.collectionName +
-        '/images/' +
-        req.files.images[i].filename;
+        '/public/leagues/' + req.body.collectionName + '/images/' + req.files.images[i].filename;
       images.push(temp);
     }
     info.images = images;
@@ -353,21 +308,17 @@ export async function updateLeague(req, res) {
   if (league && info.endTime) {
     const oldEndTime = new Date(league.endTime).getTime();
     const newEndTime = new Date(info.endTime).getTime();
-    if (
-      oldEndTime === newEndTime ||
-      league.rewarded === true ||
-      league.endTime < Date.now()
-    ) {
+    if (oldEndTime === newEndTime || league.rewarded === true || league.endTime < Date.now()) {
       shouldSchedule = false;
     }
   }
   League.findOneAndUpdate(
     {
-      _id: req.params.id
+      _id: req.params.id,
     },
     info,
     {
-      new: true
+      new: true,
     },
     (err, league) => {
       if (err) {
@@ -379,14 +330,12 @@ export async function updateLeague(req, res) {
         const job = {
           fireTime: new Date(league.endTime),
           processOwner:
-            process.env.NODE_APP_INSTANCE != null
-              ? process.env.NODE_APP_INSTANCE
-              : null
+            process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null,
         };
         Job.findOneAndUpdate(
           {
             property: league.collectionName,
-            type: 'reward'
+            type: 'reward',
           },
           job,
           (err, dbJob) => {
@@ -402,7 +351,7 @@ export async function updateLeague(req, res) {
               } else {
                 createJobHelper(dbJob, giveRewardsHelper, false)
                   .then(() => res.status(200).send(league))
-                  .catch(err => {
+                  .catch((err) => {
                     debug(err);
                     return res.sendStatus(500);
                   });
@@ -418,7 +367,7 @@ export async function updateLeague(req, res) {
 
 export async function deleteLeague(req, res) {
   League.findOneAndRemove({
-    _id: req.params.id
+    _id: req.params.id,
   })
     .lean()
     .exec((err, league) => {
@@ -426,17 +375,15 @@ export async function deleteLeague(req, res) {
         debug(err);
         return res.status(500).send(err);
       } else if (league) {
-        mongoose.connection.collections[league.collectionName].drop(err => {
+        mongoose.connection.collections[league.collectionName].drop((err) => {
           if (!err) {
             delete mongoose.connection.models[league.collectionName];
           }
         });
-        rimraf.sync(
-          path.join(__dirname, '../../public/leagues', league.collectionName)
-        );
+        rimraf.sync(path.join(__dirname, '../../public/leagues', league.collectionName));
         deleteJobHelper(league.collectionName, 'reward').catch(() => {});
         return res.status(200).send({
-          data: league
+          data: league,
         });
       } else {
         return res.sendStatus(404);

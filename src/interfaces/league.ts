@@ -1,4 +1,4 @@
-import { Document, Types } from "mongoose";
+import { Document, Types } from 'mongoose';
 
 export interface League extends Document {
   _id: Types.ObjectId;
@@ -23,4 +23,6 @@ export interface League extends Document {
   html: string;
   gameZip: string;
   color: string;
+  playersNumber?: number;
+  leadersAveragePlayedTimes?: number;
 }
