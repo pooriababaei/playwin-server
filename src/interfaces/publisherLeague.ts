@@ -13,4 +13,6 @@ export interface PublisherLeague extends Document {
   startTime: Date;
   endTime: Date;
   available: boolean;
+  playersNumber?: number;
+  leadersAveragePlayedTimes?: number;
 }
