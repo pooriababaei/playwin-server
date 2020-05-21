@@ -12,13 +12,13 @@ export function login(req, res) {
     if (req.body.hasOwnProperty('username')) {
       const usernameOrEmail = req.body.username;
       Admin.findByUsername(usernameOrEmail, pass)
-        .then(admin => {
+        .then((admin) => {
           const token = admin.generateToken();
           return res.status(200).send({ token });
         })
         .catch(() => {
           Admin.findByEmail(usernameOrEmail, pass)
-            .then(admin => {
+            .then((admin) => {
               const token = admin.generateToken();
               return res.status(200).send({ token });
             })
@@ -36,24 +36,22 @@ export function login(req, res) {
 export function forgotPassword(req, res) {
   async.waterfall(
     [
-      done => {
+      (done) => {
         const wordArray = crypto.lib.WordArray.random(32);
         const token = wordArray.toString();
         console.log(token);
         done(null, token);
       },
       (token, done) => {
-        Admin.findOne({ email: req.params.email }, function(err, admin) {
+        Admin.findOne({ email: req.params.email }, function (err, admin) {
           if (!admin) {
-            return res
-              .status(400)
-              .send('No account with that email address exists.');
+            return res.status(400).send('No account with that email address exists.');
           }
 
           admin.resetPasswordToken = token;
           admin.resetPasswordExpires = new Date(Date.now() + 3600000 / 2); // 1/2 hour
 
-          admin.save(function(err) {
+          admin.save(function (err) {
             done(err, token, admin);
           });
         });
@@ -63,8 +61,8 @@ export function forgotPassword(req, res) {
           service: 'Gmail',
           auth: {
             user: 'pooriya.babaei.1997@gmail.com',
-            pass: '' // fill with pass
-          }
+            pass: '', // fill with pass
+          },
         });
         let mailOptions = {
           to: admin.email,
@@ -78,21 +76,17 @@ export function forgotPassword(req, res) {
             'admins/checkToken/' +
             token +
             '\n\n' +
-            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n',
         };
-        smtpTransport.sendMail(mailOptions, err => {
+        smtpTransport.sendMail(mailOptions, (err) => {
           if (!err) {
-            res.send(
-              'An e-mail has been sent to ' +
-                admin.email +
-                ' with further instructions.'
-            );
+            res.send('An e-mail has been sent to ' + admin.email + ' with further instructions.');
           }
           done(err, 'done');
         });
-      }
+      },
     ],
-    err => {
+    (err) => {
       if (err) {
         return res.status(500).send(err);
       }
@@ -104,13 +98,11 @@ export function checkToken(req, res) {
     Admin.findOne(
       {
         resetPasswordToken: req.params.token,
-        resetPasswordExpires: { $gt: Date.now() }
+        resetPasswordExpires: { $gt: new Date() },
       },
       (err, admin) => {
         if (!admin) {
-          return res
-            .status(404)
-            .send('Password reset token is invalid or has expired.');
+          return res.status(404).send('Password reset token is invalid or has expired.');
         }
         const response: any = { token: req.params.token };
         response.email = admin.email;
@@ -122,24 +114,22 @@ export function checkToken(req, res) {
 export function resetPassword(req, res) {
   async.waterfall(
     [
-      done => {
+      (done) => {
         Admin.findOne(
           {
             resetPasswordToken: req.params.token,
-            resetPasswordExpires: { $gt: Date.now() }
+            resetPasswordExpires: { $gt: Date.now() },
           },
           (err, admin) => {
             if (!admin) {
-              return res
-                .status(400)
-                .send('Password reset token is invalid or has expired.');
+              return res.status(400).send('Password reset token is invalid or has expired.');
             }
             console.log(admin);
             admin.password = req.body.password;
             admin.resetPasswordToken = undefined;
             admin.resetPasswordExpires = undefined;
 
-            admin.save(err => {
+            admin.save((err) => {
               done(err, admin);
             });
           }
@@ -150,8 +140,8 @@ export function resetPassword(req, res) {
           service: 'Gmail',
           auth: {
             user: 'pooriya.babaei.1997@gmail.com',
-            pass: 'pooriya861376'
-          }
+            pass: 'pooriya861376',
+          },
         });
         const mailOptions = {
           to: admin.email,
@@ -161,17 +151,17 @@ export function resetPassword(req, res) {
             'Hello,\n\n' +
             'This is a confirmation that the password for your account ' +
             admin.email +
-            ' has just been changed.\n'
+            ' has just been changed.\n',
         };
-        smtpTransport.sendMail(mailOptions, function(err) {
+        smtpTransport.sendMail(mailOptions, function (err) {
           if (!err) {
             res.status(200).send('Success! Your password has been changed.');
           }
           done(err);
         });
-      }
+      },
     ],
-    err => {
+    (err) => {
       res.status(500).send(err);
     }
   );
