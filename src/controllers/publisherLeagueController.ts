@@ -98,7 +98,7 @@ export async function updateLeague(req, res) {
           const job = {
             fireTime: new Date(league.endTime),
             processOwner:
-              process.env.NODE_APP_INSTANCE != null ? process.env.NODE_APP_INSTANCE : null,
+              process.env.NODE_APP_INSTANCE != null ? +process.env.NODE_APP_INSTANCE : null,
           };
           Job.findOneAndUpdate(
             {
@@ -212,7 +212,7 @@ export async function getLeagues(req, res) {
     return res.sendStatus(404);
   }
   for (const league of leagues) {
-    if (league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
+    if (league.startTime < new Date() && mongoose.modelNames().includes(league.collectionName)) {
       const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
@@ -254,7 +254,7 @@ export async function getLeague(req, res) {
     if (!league) {
       return res.sendStatus(404);
     }
-    if (league.startTime < Date.now() && mongoose.modelNames().includes(league.collectionName)) {
+    if (league.startTime < new Date() && mongoose.modelNames().includes(league.collectionName)) {
       const Scoreboard = scoreboardModel(league.collectionName);
       league.playersNumber = await Scoreboard.find().countDocuments();
       const leadersPlayedTimes = await Scoreboard.find({}, 'played')
