@@ -1,5 +1,5 @@
-import { Model, model, Schema } from "mongoose";
-import { Box } from "../../interfaces/box";
+import { Model, model, Schema } from 'mongoose';
+import { Box } from '../../interfaces/box';
 
 const boxSchema = new Schema(
   {
@@ -16,5 +16,5 @@ const boxSchema = new Schema(
   { versionKey: false }
 );
 
-const boxModel: Model<Box> = model<Box>("box", boxSchema);
+const boxModel: Model<Box> = model<Box>('box', boxSchema);
 export default boxModel;

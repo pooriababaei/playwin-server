@@ -9,17 +9,17 @@ const publisherSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      set: toLower
+      set: toLower,
     },
 
     name: { type: String, required: true },
 
     password: { type: String, required: true, minLength: 6 },
 
-    thirdGame: {
+    publisherGame: {
       type: Schema.Types.ObjectId,
-      ref: 'thirdGame',
-      required: true
+      ref: 'publisherGame',
+      required: true,
     },
 
     email: {
@@ -27,21 +27,21 @@ const publisherSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      set: toLower
+      set: toLower,
     },
 
     phone: { type: String, required: true },
 
     resetPasswordToken: { type: String },
 
-    resetPasswordExpires: { type: Date }
+    resetPasswordExpires: { type: Date },
   },
   {
     timestamps: {
       createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
+      updatedAt: 'updatedAt',
     },
-    versionKey: false
+    versionKey: false,
   }
 );
 
@@ -49,7 +49,7 @@ function toLower(v) {
   return v.toLowerCase();
 }
 
-publisherSchema.methods.generateToken = function() {
+publisherSchema.methods.generateToken = function () {
   const publisher = this;
   return jwt
     .sign(
@@ -58,17 +58,17 @@ publisherSchema.methods.generateToken = function() {
         username: publisher.username,
         phoneNumber: publisher.phoneNumber,
         email: publisher.email,
-        gameId: publisher.game
+        gameId: publisher.game,
       },
       process.env.PUBLISHER_KEY
     )
     .toString();
 };
 
-publisherSchema.statics.findByUsername = function(username, password) {
+publisherSchema.statics.findByUsername = function (username, password) {
   const Publisher = this;
 
-  return Publisher.findOne({ username }).then(publisher => {
+  return Publisher.findOne({ username }).then((publisher) => {
     if (!publisher) {
       return Promise.reject();
     }
@@ -84,9 +84,9 @@ publisherSchema.statics.findByUsername = function(username, password) {
     });
   });
 };
-publisherSchema.statics.findByEmail = function(email, password) {
+publisherSchema.statics.findByEmail = function (email, password) {
   const Publisher = this;
-  return Publisher.findOne({ email }).then(publisher => {
+  return Publisher.findOne({ email }).then((publisher) => {
     if (!publisher) {
       return Promise.reject();
     }
@@ -103,7 +103,7 @@ publisherSchema.statics.findByEmail = function(email, password) {
   });
 };
 
-publisherSchema.pre<Publisher>('save', function(next) {
+publisherSchema.pre<Publisher>('save', function (next) {
   const publisher = this;
   if (publisher.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
@@ -117,7 +117,7 @@ publisherSchema.pre<Publisher>('save', function(next) {
   }
 });
 
-publisherSchema.virtual('id').get(function() {
+publisherSchema.virtual('id').get(function () {
   return this._id;
 });
 

@@ -5,7 +5,7 @@ import ToPay from '../db/models/toPay';
 import User from '../db/models/user';
 import League from '../db/models/league';
 import { scoreboardModel } from '../db/models/scoreboard';
-import WeeklyLeader from '../db/models/weeklyLeader';
+import WeeklyReward from '../db/models/weeklyReward';
 import Achievement from '../db/models/achievement';
 
 const debug = Debug('Currency Controller:');
@@ -35,7 +35,7 @@ async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
           avatar: userInfo.avatar,
           opportunity: league.defaultOpportunity + oppo,
           createdAt: Date.now(),
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
         };
       } else if (record) {
         if (
@@ -59,7 +59,7 @@ async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
           { _id: userId },
           { $inc: { coupon: 0 - oppo } },
           { session, new: true }
-        )
+        ),
       ]);
       await session.commitTransaction();
       session.endSession();
@@ -109,25 +109,21 @@ export async function giveRewardsHelper(collectionName) {
     if (league.endTime >= Date.now() || league.rewarded === true) {
       throw 400;
     }
-    const rewardUsers: any = await getRecordsHelper(
-      league.collectionName,
-      league.leadersNumber,
-      1
-    );
+    const rewardUsers: any = await getRecordsHelper(league.collectionName, league.leadersNumber, 1);
     for (const record of rewardUsers) {
       await User.findOneAndUpdate(
         { _id: record.user },
         {
           $inc: {
             reward: league.reward / league.leadersNumber,
-            totalReward: league.reward
-          }
+            totalReward: league.reward,
+          },
         },
         opts
       );
-      const wl = new WeeklyLeader({
+      const wl = new WeeklyReward({
         user: record.user,
-        reward: league.reward / league.leadersNumber
+        reward: league.reward / league.leadersNumber,
       });
       await wl.save().catch(() => {}); // not so important to impact transaction
     }
@@ -137,7 +133,7 @@ export async function giveRewardsHelper(collectionName) {
         league.loyaltyGiven,
         1
       );
-      loyaltyUsers.forEach(record => {
+      loyaltyUsers.forEach((record) => {
         User.findOneAndUpdate(
           { _id: record.user },
           { $inc: { loyalty: league.loyaltyReward } },
@@ -185,13 +181,13 @@ export function exchangecouponToLeagueOppo(req, res) {
   if (!oppo || oppo === 0) return res.sendStatus(400);
 
   exchangecouponToLeagueOppoHelper(req.userId, oppo, league)
-    .then(result => {
+    .then((result) => {
       res.status(200).json(result);
     })
-    .catch(err => {
+    .catch((err) => {
       if (err === 1 || err === 2) {
         return res.status(400).send({
-          code: err
+          code: err,
         });
       }
       res.status(500).send(err.toString());
@@ -203,13 +199,13 @@ export function exchangecouponToLeagueOppo(req, res) {
 export function exchangeRewardToMoney(req, res) {
   try {
     exchangeRewardToMoneyHelper(req.userId)
-      .then(result => {
+      .then((result) => {
         res.status(200).send(result.toString());
       })
-      .catch(err => {
+      .catch((err) => {
         if (err === 2) {
           return res.status(400).send({
-            code: err
+            code: err,
           });
         }
         res.sendStatus(500);
@@ -222,10 +218,10 @@ export function exchangeRewardToMoney(req, res) {
 export function giveRewards(req, res) {
   const collectionName = req.params.collectionName;
   giveRewardsHelper(collectionName)
-    .then(result => {
+    .then((result) => {
       return res.status(200).send(result);
     })
-    .catch(err => {
+    .catch((err) => {
       debug(err);
       return res.sendStatus(500);
     });
@@ -248,13 +244,9 @@ export async function achieve(req, res) {
       return res.sendStatus(400);
     }
     const user = await User.findOne({
-      username: req.username
+      username: req.username,
     });
-    if (
-      !user ||
-      (user.achievements != null &&
-        user.achievements.indexOf(achievementId) >= 0)
-    ) {
+    if (!user || (user.achievements != null && user.achievements.indexOf(achievementId) >= 0)) {
       return res.sendStatus(400);
     }
   } catch (e) {
@@ -262,15 +254,15 @@ export async function achieve(req, res) {
   }
   User.findOneAndUpdate(
     {
-      username: req.username
+      username: req.username,
     },
     {
       $push: {
-        achievements: achievementId
-      }
+        achievements: achievementId,
+      },
     },
     {
-      new: true
+      new: true,
     },
     (err, updatedUser) => {
       if (err) {

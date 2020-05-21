@@ -1,8 +1,8 @@
 import { Model, model, Schema } from 'mongoose';
-import { ThirdLeague } from '../../interfaces/thirdLeague';
+import { PublisherLeague } from '../../interfaces/publisherLeague';
 const leagueSchema = new Schema(
   {
-    game: { type: Schema.Types.ObjectId, ref: 'thirdGame' },
+    game: { type: Schema.Types.ObjectId, ref: 'publisherGame' },
 
     collectionName: { type: String, unique: true },
 
@@ -22,13 +22,13 @@ const leagueSchema = new Schema(
 
     endTime: { type: Date, required: true },
 
-    available: { type: Boolean, default: false } // available to users
+    available: { type: Boolean, default: false }, // available to users
   },
   { versionKey: false }
 );
 
-const thirdLeagueModel: Model<ThirdLeague> = model<ThirdLeague>(
-  'thirdLeague',
+const publisherLeagueModel: Model<PublisherLeague> = model<PublisherLeague>(
+  'publisherLeague',
   leagueSchema
 );
-export default thirdLeagueModel;
+export default publisherLeagueModel;

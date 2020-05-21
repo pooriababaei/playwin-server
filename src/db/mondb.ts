@@ -16,13 +16,12 @@ import './models/boxPurchase';
 import './models/game';
 import './models/job';
 import './models/league';
-import './models/thirdLeague';
+import './models/publisherLeague';
 import { scoreboardModel } from './models/scoreboard';
 import './models/toPay';
 import './models/user';
-import './models/weeklyLeader';
+import './models/weeklyReward';
 import League from './models/league';
-//const League = mongoose.model("league");
 
 // mongoose.connect(dbUrl,{ keepAlive: true, keepAliveInitialDelay: 300000, useUnifiedTopology: true}).then(() => {
 mongoose
@@ -33,7 +32,7 @@ mongoose
     replicaSet: 'rs0',
     user: 'admin',
     pass: 'Playwin@2019',
-    authSource: 'admin'
+    authSource: 'admin',
   })
   .then(() => {
     League.find((err, leagues) => {
@@ -41,14 +40,14 @@ mongoose
         debug(err);
       }
       if (!err) {
-        leagues.forEach(item => {
+        leagues.forEach((item) => {
           scoreboardModel(item.collectionName, item.defaultOpportunity - 1);
         });
       }
-      debug('database connected :)');
+      console.log('database connected :)');
     });
   })
-  .catch(err => {
+  .catch((err) => {
     debug(err);
   });
 

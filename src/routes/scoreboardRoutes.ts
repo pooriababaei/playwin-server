@@ -5,11 +5,7 @@ const router = express.Router();
 import Debug from 'debug';
 const debug = Debug('Scorebaord Route:');
 
-router.get(
-  '/weeklyLeaders',
-  isUserOrAdmin,
-  scoreboardController.getWeeklyLeaders
-);
+router.get('/weeklyRewards', isUserOrAdmin, scoreboardController.getWeeklyRewards);
 router.get('/topUsers', isUserOrAdmin, scoreboardController.getTopUsers);
 router.get('/:collectionName', isUserOrAdmin, scoreboardController.getRecords);
 router.get(
@@ -19,16 +15,8 @@ router.get(
   isLeagueUp,
   scoreboardController.modifyScoreboard
 ); // isApp
-router.get(
-  '/userRecord/:collectionName',
-  isUser,
-  scoreboardController.getUserRecord
-);
-router.get(
-  '/userRank/:collectionName',
-  isUser,
-  scoreboardController.getUserRank
-);
+router.get('/userRecord/:collectionName', isUser, scoreboardController.getUserRecord);
+router.get('/userRank/:collectionName', isUser, scoreboardController.getUserRank);
 router.get(
   '/surroundingUsers/:collectionName/:limit',
   isUser,

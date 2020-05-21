@@ -1,22 +1,18 @@
 import Debug from 'debug';
 import _ from 'underscore';
-import ThirdGame from '../db/models/thirdGame';
-const debug = Debug('ThirdGame Controller:');
+import PublisherGame from '../db/models/publisherGame';
+const debug = Debug('PublisherGame Controller:');
 
-export function createThirdGame(req, res) {
+export function createPublisherGame(req, res) {
   let mainImage;
   const info = _.pick(req.body, 'name', 'description', 'link', 'available');
 
   if (req.files && req.files.mainImage) {
-    mainImage =
-      '/public/thirdGames/' +
-      req.body.name +
-      '/' +
-      req.files.mainImage[0].filename;
+    mainImage = '/public/publisherGames/' + req.body.name + '/' + req.files.mainImage[0].filename;
     info.mainImage = mainImage;
   }
 
-  const gameToSave = new ThirdGame(info);
+  const gameToSave = new PublisherGame(info);
   gameToSave.save((err, game) => {
     if (err) {
       debug(err);
@@ -26,26 +22,22 @@ export function createThirdGame(req, res) {
   });
 }
 
-export function updateThirdGame(req, res) {
+export function updatePublisherGame(req, res) {
   let mainImage;
   const info = _.pick(req.body, 'name', 'description', 'link', 'available');
 
   if (req.files && req.files.mainImage) {
-    mainImage =
-      '/public/thirdGames/' +
-      req.body.name +
-      '/' +
-      req.files.mainImage[0].filename;
+    mainImage = '/public/publisherGames/' + req.body.name + '/' + req.files.mainImage[0].filename;
     info.mainImage = mainImage;
   }
 
-  ThirdGame.findOneAndUpdate(
+  PublisherGame.findOneAndUpdate(
     {
-      _id: req.params.id
+      _id: req.params.id,
     },
     info,
     {
-      new: true
+      new: true,
     },
     (err, game) => {
       if (err) {

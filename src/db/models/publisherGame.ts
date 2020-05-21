@@ -1,5 +1,5 @@
 import { Model, model, Schema } from 'mongoose';
-import { ThirdGame } from '../../interfaces/thirdGame';
+import { PublisherGame } from '../../interfaces/publisherGame';
 const gameSchema = new Schema(
   {
     name: { type: String, minLength: 3, required: true },
@@ -10,13 +10,10 @@ const gameSchema = new Schema(
 
     mainImage: { type: String, required: true },
 
-    link: { type: String }
+    link: { type: String },
   },
   { versionKey: false }
 );
 
-const thirdGameModel: Model<ThirdGame> = model<ThirdGame>(
-  'thirdGame',
-  gameSchema
-);
-export default thirdGameModel;
+const publisherGameModel: Model<PublisherGame> = model<PublisherGame>('publisherGame', gameSchema);
+export default publisherGameModel;

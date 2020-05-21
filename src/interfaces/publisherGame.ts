@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export interface ThirdGame extends Document {
+export interface PublisherGame extends Document {
   _id: Types.ObjectId;
   name: string;
   description: string;

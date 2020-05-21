@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { ADVERTISE_REWARD_COUPON } from '../utils/globals';
 import User from '../db/models/user';
 import { scoreboardModel } from '../db/models/scoreboard';
-import WeeklyLeader from '../db/models/weeklyLeader';
+import WeeklyReward from '../db/models/weeklyReward';
 
 const debug = Debug('Scoreboard Controller:');
 
@@ -17,8 +17,8 @@ async function surroundingUsersHelper(league, userId, limit) {
   let count = await Scoreboard.find({
     $or: [
       { score: { $gt: user.score } },
-      { $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }] }
-    ]
+      { $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }] },
+    ],
   })
     .sort({ score: -1, updatedAt: 1 })
     .countDocuments();
@@ -31,9 +31,9 @@ async function surroundingUsersHelper(league, userId, limit) {
       $or: [
         { score: { $lt: user.score } },
         {
-          $and: [{ score: user.score }, { updatedAt: { $gt: user.updatedAt } }]
-        }
-      ]
+          $and: [{ score: user.score }, { updatedAt: { $gt: user.updatedAt } }],
+        },
+      ],
     })
       .sort({ score: -1, updatedAt: 1 })
       .limit(limit)
@@ -45,21 +45,18 @@ async function surroundingUsersHelper(league, userId, limit) {
       $or: [
         { score: { $gt: user.score } },
         {
-          $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }]
-        }
-      ]
+          $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }],
+        },
+      ],
     })
       .sort({ score: 1, updatedAt: -1 })
       .limit(limit)
       .populate({ path: 'user', select: 'username avatar' })
-      .lean()
+      .lean(),
   ]);
 
-  let page = better
-    .reverse()
-    .concat(user)
-    .concat(worse);
-  const userIndex = page.findIndex(record => {
+  let page = better.reverse().concat(user).concat(worse);
+  const userIndex = page.findIndex((record) => {
     return record.user === userId;
   });
 
@@ -75,8 +72,8 @@ async function userRankHelper(league, userId) {
   const count = await Scoreboard.find({
     $or: [
       { score: { $gt: user.score } },
-      { $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }] }
-    ]
+      { $and: [{ score: user.score }, { updatedAt: { $lt: user.updatedAt } }] },
+    ],
   })
     .sort({ score: -1, updatedAt: 1 })
     .countDocuments();
@@ -99,7 +96,7 @@ export function modifyScoreboard(req, res) {
       case 1: // reduce oppo  . this should be passed to play one game round in client
         Scoreboard.findOne(
           {
-            user: req.userId
+            user: req.userId,
           },
           (err, result) => {
             if (err) {
@@ -111,7 +108,7 @@ export function modifyScoreboard(req, res) {
                 username: req.username,
                 avatar: req.avatar,
                 createdAt: Date.now(),
-                updatedAt: Date.now()
+                updatedAt: Date.now(),
               });
               record.save((err, record) => {
                 if (err) {
@@ -120,15 +117,15 @@ export function modifyScoreboard(req, res) {
                 if (record) {
                   User.findOneAndUpdate(
                     {
-                      _id: req.userId
+                      _id: req.userId,
                     },
                     {
                       $push: {
-                        participatedLeagues: req.league._id
-                      }
+                        participatedLeagues: req.league._id,
+                      },
                     },
                     {
-                      new: true
+                      new: true,
                     },
                     (err, user) => {
                       if (err) {
@@ -144,8 +141,7 @@ export function modifyScoreboard(req, res) {
             } else if (result && result.opportunity > 0) {
               if (
                 !req.league.maxOpportunity ||
-                (req.league.maxOpportunity &&
-                  req.league.maxOpportunity > result.played)
+                (req.league.maxOpportunity && req.league.maxOpportunity > result.played)
               ) {
                 let newRecord = result;
                 newRecord.opportunity = result.opportunity - 1;
@@ -159,12 +155,12 @@ export function modifyScoreboard(req, res) {
                 });
               } else {
                 return res.status(200).json({
-                  code: 3
+                  code: 3,
                 });
               } // reach maximum number of game plays
             } else if (result && result.opportunity <= 0) {
               return res.status(200).json({
-                code: 1
+                code: 1,
               });
             } // no opportunity
           }
@@ -175,7 +171,7 @@ export function modifyScoreboard(req, res) {
           const score = req.score;
           Scoreboard.findOne(
             {
-              user: req.userId
+              user: req.userId,
             },
             (err, result) => {
               if (err) {
@@ -184,13 +180,9 @@ export function modifyScoreboard(req, res) {
 
               if (!result) {
                 return res.status(400).json({
-                  code: 1
+                  code: 1,
                 }); // not legal
-              } else if (
-                result &&
-                result.opportunity >= 0 &&
-                result.score < score
-              ) {
+              } else if (result && result.opportunity >= 0 && result.score < score) {
                 const newRecord = result;
                 newRecord.score = score;
                 newRecord.updatedAt = new Date();
@@ -206,18 +198,14 @@ export function modifyScoreboard(req, res) {
                     return res.status(200).send(result1);
                   }
                 });
-              } else if (
-                result &&
-                result.opportunity >= 0 &&
-                result.score >= score
-              ) {
+              } else if (result && result.opportunity >= 0 && result.score >= score) {
                 return res.status(400).json({
-                  code: 2
+                  code: 2,
                 }); // score is less than  or equal record .it shouldn't have been sent
               } else if (result && result.opportunity < 0) {
                 // maybe not needed because we check it in reduceOppo mode
                 return res.status(200).json({
-                  code: 1
+                  code: 1,
                 });
               } // not legal req
             }
@@ -232,7 +220,7 @@ export function modifyScoreboard(req, res) {
           const score = req.score;
           Scoreboard.findOne(
             {
-              user: req.userId
+              user: req.userId,
             },
             (err, result) => {
               if (err) {
@@ -246,7 +234,7 @@ export function modifyScoreboard(req, res) {
                   avatar: req.avatar,
                   score: score,
                   createdAt: Date.now(),
-                  updatedAt: Date.now()
+                  updatedAt: Date.now(),
                 });
                 record.save((err, record) => {
                   if (err) {
@@ -255,15 +243,15 @@ export function modifyScoreboard(req, res) {
                   if (record) {
                     User.findOneAndUpdate(
                       {
-                        _id: req.userId
+                        _id: req.userId,
                       },
                       {
                         $push: {
-                          participatedLeagues: req.league._id
-                        }
+                          participatedLeagues: req.league._id,
+                        },
                       },
                       {
-                        new: true
+                        new: true,
                       },
                       (err, user) => {
                         if (err) {
@@ -276,15 +264,10 @@ export function modifyScoreboard(req, res) {
                     );
                   }
                 });
-              } else if (
-                result &&
-                result.opportunity > 0 &&
-                result.score < score
-              ) {
+              } else if (result && result.opportunity > 0 && result.score < score) {
                 if (
                   !req.league.maxOpportunity ||
-                  (req.league.maxOpportunity &&
-                    req.league.maxOpportunity >= result.played)
+                  (req.league.maxOpportunity && req.league.maxOpportunity >= result.played)
                 ) {
                   let newRecord = result;
                   newRecord.score = score;
@@ -301,20 +284,16 @@ export function modifyScoreboard(req, res) {
                   });
                 } else {
                   return res.status(400).json({
-                    code: 3
+                    code: 3,
                   });
                 } // reach maximum number game plays
-              } else if (
-                result &&
-                result.opportunity > 0 &&
-                result.score >= score
-              ) {
+              } else if (result && result.opportunity > 0 && result.score >= score) {
                 return res.status(400).json({
-                  code: 2
+                  code: 2,
                 }); // score is less than  or equal record .it shouldn't have been sent
               } else if (result && result.opportunity <= 0) {
                 return res.status(400).json({
-                  code: 1
+                  code: 1,
                 });
               } // no oppotunity
             }
@@ -326,7 +305,7 @@ export function modifyScoreboard(req, res) {
       case 4:
         Scoreboard.findOne(
           {
-            user: req.userId
+            user: req.userId,
           },
           (err, result) => {
             if (err) {
@@ -345,7 +324,7 @@ export function modifyScoreboard(req, res) {
                     ? req.league.dafaultOpportunity
                     : req.league.dafaultOpportunity + ADVERTISE_REWARD_COUPON,
                 createdAt: Date.now(),
-                updatedAt: Date.now()
+                updatedAt: Date.now(),
               });
               record.save((err, record) => {
                 if (err) {
@@ -354,15 +333,15 @@ export function modifyScoreboard(req, res) {
                 if (record) {
                   User.findOneAndUpdate(
                     {
-                      _id: req.userId
+                      _id: req.userId,
                     },
                     {
                       $push: {
-                        participatedLeagues: req.league._id
-                      }
+                        participatedLeagues: req.league._id,
+                      },
                     },
                     {
-                      new: true
+                      new: true,
                     },
                     (err, user) => {
                       if (err) {
@@ -382,8 +361,7 @@ export function modifyScoreboard(req, res) {
                   req.league.maxOpportunity)
             ) {
               let newRecord = result;
-              newRecord.opportunity =
-                result.opportunity + ADVERTISE_REWARD_COUPON;
+              newRecord.opportunity = result.opportunity + ADVERTISE_REWARD_COUPON;
               newRecord.save((err, result1) => {
                 if (err) {
                   return res.status(400).send(err);
@@ -411,11 +389,11 @@ export function getUserRecord(req, res) {
   const Scoreboard = scoreboardModel(req.params.collectionName);
 
   Scoreboard.findOne({
-    user: req.userId
+    user: req.userId,
   })
     .populate({
       path: 'user',
-      select: 'username avatar'
+      select: 'username avatar',
     })
     .exec((err, result) => {
       if (err) {
@@ -434,16 +412,16 @@ export function getUserRank(req, res) {
   }
   const league = req.params.collectionName;
   userRankHelper(league, req.userId)
-    .then(rank => {
+    .then((rank) => {
       if (rank) {
         return res.status(200).json({
-          rank
+          rank,
         });
       } else {
         return res.status(404).send();
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return res.status(404).send(err);
     });
 }
@@ -456,10 +434,10 @@ export function getSurroundingUsers(req, res) {
   const limit = parseInt(req.params.limit);
 
   surroundingUsersHelper(league, req.userId, limit)
-    .then(page => {
+    .then((page) => {
       return res.status(200).json(page);
     })
-    .catch(err => {
+    .catch((err) => {
       if (err === 400) {
         return res.sendStatus(400);
       }
@@ -481,7 +459,7 @@ export async function getRecords(req, res) {
   const Scoreboard = scoreboardModel(league);
   const sort = {
     score: -1,
-    updatedAt: 1
+    updatedAt: 1,
   };
   // if (filter && filter.username) query.find({username: { $regex: '.*' + filter.username + '.*' } });
   // if (filter && filter.phoneNumber) query.find({phoneNumber: { $regex: '.*' + filter.phoneNumber + '.*' }});
@@ -492,56 +470,56 @@ export async function getRecords(req, res) {
     .sort(sort)
     .populate({
       path: 'user',
-      select: 'username avatar'
+      select: 'username avatar',
     })
     .lean();
   return res
     .set({
       'Access-Control-Expose-Headers': 'x-total-count',
-      'x-total-count': count
+      'x-total-count': count,
     })
     .status(200)
     .send(records);
 }
 
-export async function getWeeklyLeaders(req, res) {
+export async function getWeeklyRewards(req, res) {
   const pipeline = [
     { $match: { score: { $gt: 0 } } },
     {
       $group: {
         _id: '$user',
         totalReward: {
-          $sum: '$reward'
-        }
-      }
+          $sum: '$reward',
+        },
+      },
     },
     {
       $sort: {
-        totalReward: -1
-      }
+        totalReward: -1,
+      },
     },
     {
-      $limit: 100
+      $limit: 100,
     },
     {
       $lookup: {
         from: User.collection.name,
         localField: '_id',
         foreignField: '_id',
-        as: 'user'
-      }
+        as: 'user',
+      },
     },
     {
       $project: {
         _id: 0,
         username: '$user.username',
         totalReward: 1,
-        avatar: '$user.avatar'
-      }
-    }
+        avatar: '$user.avatar',
+      },
+    },
   ];
 
-  WeeklyLeader.aggregate(pipeline).exec((err, result) => {
+  WeeklyReward.aggregate(pipeline).exec((err, result) => {
     if (err) {
       debug(err);
       return res.sendStatus(500);

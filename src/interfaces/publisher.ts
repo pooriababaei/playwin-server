@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 export interface Publisher extends Document {
   _id: Types.ObjectId;
   id: any;
-  thirdGame: Types.ObjectId;
+  publisherGame: Types.ObjectId;
   name: string;
   username: string;
   password: string;

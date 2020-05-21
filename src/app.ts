@@ -20,7 +20,6 @@ app.use((req, res, next) => {
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept,Authorization,Content-Size'
   );
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
 });
 
@@ -29,7 +28,7 @@ app.use(
   bodyParser.urlencoded({
     limit: '50mb',
     extended: true,
-    parameterLimit: 1000000
+    parameterLimit: 1000000,
   })
 );
 app.use(cookieParser());
