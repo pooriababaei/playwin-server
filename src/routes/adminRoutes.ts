@@ -15,9 +15,9 @@ router
   .put(isSuperAdmin, adminController.updateAdmin)
   .delete(isSuperAdmin, adminController.deleteAdmin);
 
-router.post('/login', authController.login);
-router.get('/forgotPassword/:email', authController.forgotPassword);
-router.get('/checkToken/:token', authController.checkToken);
-router.post('/resetPassword/:token', authController.resetPassword);
+router.post('/auth/login', authController.login);
+router.get('/auth/forgotPassword/:email', authController.forgotPassword);
+router.get('/auth/checkToken/:token', authController.checkToken);
+router.post('/auth/resetPassword/:token', authController.resetPassword);
 
 export default router;
