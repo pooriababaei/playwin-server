@@ -9,7 +9,7 @@ const adminSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      set: toLower
+      set: toLower,
     },
 
     name: { type: String, required: true },
@@ -21,7 +21,7 @@ const adminSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      set: toLower
+      set: toLower,
     },
 
     phone: { type: String, required: true },
@@ -33,15 +33,15 @@ const adminSchema = new Schema(
     role: {
       type: String,
       enum: ['admin', 'superadmin'],
-      default: 'admin'
-    }
+      default: 'admin',
+    },
   },
   {
     timestamps: {
       createdAt: 'createdAt',
-      updatedAt: 'updatedAt'
+      updatedAt: 'updatedAt',
     },
-    versionKey: false
+    versionKey: false,
   }
 );
 
@@ -49,26 +49,26 @@ function toLower(v) {
   return v.toLowerCase();
 }
 
-adminSchema.methods.generateToken = function() {
+adminSchema.methods.generateToken = function () {
   let admin = this;
   return jwt
     .sign(
       {
         _id: admin._id,
         username: admin.username,
-        phoneNumber: admin.phoneNumber,
+        phone: admin.phone,
         email: admin.email,
-        role: admin.role
+        role: admin.role,
       },
       process.env.ADMIN_KEY
     )
     .toString();
 };
 
-adminSchema.statics.findByUsername = function(username, password) {
+adminSchema.statics.findByUsername = function (username, password) {
   const Admin = this;
 
-  return Admin.findOne({ username }).then(admin => {
+  return Admin.findOne({ username }).then((admin) => {
     if (!admin) {
       return Promise.reject();
     }
@@ -84,9 +84,9 @@ adminSchema.statics.findByUsername = function(username, password) {
     });
   });
 };
-adminSchema.statics.findByEmail = function(email, password) {
+adminSchema.statics.findByEmail = function (email, password) {
   const Admin = this;
-  return Admin.findOne({ email }).then(admin => {
+  return Admin.findOne({ email }).then((admin) => {
     if (!admin) {
       return Promise.reject();
     }
@@ -103,7 +103,7 @@ adminSchema.statics.findByEmail = function(email, password) {
   });
 };
 
-adminSchema.pre<Admin>('save', function(next) {
+adminSchema.pre<Admin>('save', function (next) {
   const admin = this;
   if (admin.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
@@ -117,7 +117,7 @@ adminSchema.pre<Admin>('save', function(next) {
   }
 });
 
-adminSchema.virtual('id').get(function() {
+adminSchema.virtual('id').get(function () {
   return this._id;
 });
 

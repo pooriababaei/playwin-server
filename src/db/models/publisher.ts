@@ -56,7 +56,7 @@ publisherSchema.methods.generateToken = function () {
       {
         _id: publisher._id,
         username: publisher.username,
-        phoneNumber: publisher.phoneNumber,
+        phone: publisher.phone,
         email: publisher.email,
         gameId: publisher.game,
       },
