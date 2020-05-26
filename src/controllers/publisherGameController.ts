@@ -36,7 +36,7 @@ export function createPublisherGame(req, res) {
   const info = _.pick(req.body, 'name', 'description', 'link', 'available');
 
   if (req.files && req.files.image) {
-    image = '/public/publisherGames/' + req.body.name + '/' + req.files.image[0].filename;
+    image = '/public/publisherGameImages/' + req.body.name + '/' + req.files.image[0].filename;
     info.image = image;
   }
 
