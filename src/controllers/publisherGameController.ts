@@ -55,7 +55,8 @@ export function updatePublisherGame(req, res) {
   const info = _.pick(req.body, 'name', 'description', 'link', 'available');
 
   if (req.files && req.files.mainImage) {
-    mainImage = '/public/publisherGames/' + req.body.name + '/' + req.files.mainImage[0].filename;
+    mainImage =
+      '/public/publisherGameImages/' + req.body.name + '/' + req.files.mainImage[0].filename;
     info.mainImage = mainImage;
   }
 
