@@ -1,6 +1,7 @@
 export { default as adminRoutes } from './adminRoutes';
 export { default as userRoutes } from './userRoutes';
 export { default as publisherRoutes } from './publisherRoutes';
+export { default as publisherGameRoutes } from './publisherGameRoutes';
 export { default as boxRoutes } from './boxRoutes';
 export { default as paymentRoutes } from './paymentRoutes';
 export { default as leagueRoutes } from './leagueRoutes';

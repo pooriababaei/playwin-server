@@ -5,7 +5,7 @@ import Debug from 'debug';
 const debug = Debug('Publisher Controller:');
 
 export function createPublisher(req, res) {
-  const info = _.pick(req.body, 'name', 'username', 'phone', 'password', 'email');
+  const info = _.pick(req.body, 'name', 'username', 'publisherGame', 'phone', 'password', 'email');
   const publisher = new Publisher(info);
   publisher.save((err, publisher) => {
     if (err) {

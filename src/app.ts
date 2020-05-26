@@ -39,6 +39,7 @@ app.use('/ftp', express.static('public'), serve('public', { icons: true }));
 app.use('/users', routes.userRoutes);
 app.use('/admins', routes.adminRoutes);
 app.use('/publishers', routes.publisherRoutes);
+app.use('/publisherGames', routes.publisherGameRoutes);
 app.use('/leagues', routes.leagueRoutes);
 app.use('/publisherLeagues', routes.leagueRoutes);
 app.use('/games', routes.gameRoutes);

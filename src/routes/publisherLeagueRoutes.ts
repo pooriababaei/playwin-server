@@ -9,7 +9,7 @@ const router = express.Router();
 router.route('/').get(leagueController.getLeagues).post(isPublisher, leagueController.createLeague);
 router
   .route('/:id')
-  .get(isPublisherOrAdmin, leagueController.getLeague)
+  .get(leagueController.getLeague)
   .put(isPublisherOrAdmin, leagueUpload, leagueController.updateLeague)
   .delete(isPublisherOrAdmin, leagueController.deleteLeague);
 

@@ -5,6 +5,6 @@ export interface PublisherGame extends Document {
   name: string;
   description: string;
   available: boolean;
-  mainImage: string;
+  image: string;
   link: string;
 }
