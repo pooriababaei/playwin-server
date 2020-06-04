@@ -1,9 +1,8 @@
-import Debug from 'debug';
 import express from 'express';
 import * as gameController from '../controllers/publisherGameController';
 import { publisherGameUpload } from '../utils/fileUpload';
 import { isAdmin, isUserOrAdmin } from '../utils/middlewares';
-let router = express.Router();
+const router = express.Router();
 
 router
   .route('/')
