@@ -29,9 +29,9 @@ mongoose
     keepAlive: true,
     keepAliveInitialDelay: 300000,
     useUnifiedTopology: true,
-    replicaSet: 'rs0',
+    //  replicaSet: 'rs0',
     user: 'admin',
-    pass: 'Playwin@2019',
+    pass: 'Nem@dino2020',
     authSource: 'admin',
   })
   .then(() => {
