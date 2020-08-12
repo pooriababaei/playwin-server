@@ -19,11 +19,11 @@ mongoose
   .connect(dbUrl, {
     keepAlive: true,
     keepAliveInitialDelay: 300000,
-    replicaSet: 'rs0',
+    //  replicaSet: 'rs0',
     useUnifiedTopology: true,
     user: 'admin',
-    pass: 'Playwin@2019',
-    authSource: 'admin'
+    pass: 'Nem@dino2020',
+    authSource: 'admin',
   })
   .then(() => {
     League.find((err, leagues) => {
@@ -31,7 +31,7 @@ mongoose
         debug(err);
       }
       if (!err) {
-        leagues.forEach(item => {
+        leagues.forEach((item) => {
           scoreboardModel(item.collectionName, item.defaultOpportunity);
         });
       }
@@ -41,7 +41,7 @@ mongoose
       });
     });
   })
-  .catch(err => {
+  .catch((err) => {
     debug(err);
   });
 
@@ -52,7 +52,7 @@ async function createSuperAdmin() {
     name: 'pooriya babaei',
     email: 'pooriya.babaei.1997@gmail.com',
     phone: '09139236452',
-    role: 'superadmin'
+    role: 'superadmin',
   });
   await admin.save();
   return true;
@@ -66,7 +66,7 @@ async function f() {
       username: 'nabi',
       score: Math.floor(Math.random() * 10000),
       opportunity: i,
-      avatar: Math.floor(Math.random() * 3)
+      avatar: Math.floor(Math.random() * 3),
     });
     await record.save();
   }
