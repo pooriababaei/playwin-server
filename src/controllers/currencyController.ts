@@ -12,10 +12,7 @@ const debug = Debug('Currency Controller:');
 
 ///////// helper functions
 async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    const opts = { session };
     const Scoreboard = scoreboardModel(league.collectionName);
     const userInfo = await User.findById(userId);
     if (userInfo && userInfo.coupon >= oppo) {
@@ -54,54 +51,35 @@ async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
 
       const newRecordToSave = new Scoreboard(newRecord);
       const [nr, user]: any = await Promise.all([
-        newRecordToSave.save(opts),
-        User.findOneAndUpdate(
-          { _id: userId },
-          { $inc: { coupon: 0 - oppo } },
-          { session, new: true }
-        ),
+        newRecordToSave.save(),
+        User.findOneAndUpdate({ _id: userId }, { $inc: { coupon: 0 - oppo } }, { new: true }),
       ]);
-      await session.commitTransaction();
-      session.endSession();
       return { record: nr, user };
     } else {
       throw 1;
     } // not enough oppo
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     throw error; // Rethrow so calling function sees error
   }
 }
 async function exchangeRewardToMoneyHelper(userId) {
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    const opts = { session };
     const user = await User.findById(userId);
     if (user && user.reward < REWARD_TRESHOLD_TO_EXCHANGE) {
       throw 2;
     } // not enough reward
     const toPay = new ToPay({ user: userId, amount: user.reward });
-    await toPay.save(opts);
+    await toPay.save();
     user.reward = 0;
-    await user.save(opts);
+    await user.save();
 
-    await session.commitTransaction();
-    session.endSession();
     return user.reward;
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     throw error; // Rethrow so calling function sees error
   }
 }
 export async function giveRewardsHelper(collectionName) {
-  const session = await mongoose.startSession();
-
-  session.startTransaction();
   try {
-    const opts = { session };
     const league = await League.findOne({ collectionName }).lean();
     if (!league) {
       throw 404;
@@ -118,8 +96,7 @@ export async function giveRewardsHelper(collectionName) {
             reward: league.reward / league.leadersNumber,
             totalReward: league.reward,
           },
-        },
-        opts
+        }
       );
       const wl = new WeeklyReward({
         user: record.user,
@@ -134,28 +111,167 @@ export async function giveRewardsHelper(collectionName) {
         1
       );
       loyaltyUsers.forEach((record) => {
-        User.findOneAndUpdate(
-          { _id: record.user },
-          { $inc: { loyalty: league.loyaltyReward } },
-          opts
-        );
+        User.findOneAndUpdate({ _id: record.user }, { $inc: { loyalty: league.loyaltyReward } });
       });
     }
 
     const newLeague = await League.findOneAndUpdate(
       { collectionName },
       { rewarded: true },
-      { session, new: true }
+      { new: true }
     );
-    await session.commitTransaction();
-    session.endSession();
     return newLeague;
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
     throw error; // Rethrow so calling function sees error
   }
 }
+//with transaction
+// async function exchangecouponToLeagueOppoHelper(userId, oppo, league) {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+//   try {
+//     const opts = { session };
+//     const Scoreboard = scoreboardModel(league.collectionName);
+//     const userInfo = await User.findById(userId);
+//     if (userInfo && userInfo.coupon >= oppo) {
+//       const record = await Scoreboard.findOne({ user: userId });
+//       let newRecord = null;
+
+//       if (record == null) {
+//         if (
+//           league.maxOpportunity &&
+//           parseInt(oppo) + league.dafaultOpportunity > league.maxOpportunity
+//         ) {
+//           throw 2; //this is somehow a bad request. client mistake!!!
+//         }
+//         newRecord = {
+//           user: userId,
+//           played: 0,
+//           avatar: userInfo.avatar,
+//           opportunity: league.defaultOpportunity + oppo,
+//           createdAt: Date.now(),
+//           updatedAt: Date.now(),
+//         };
+//       } else if (record) {
+//         if (
+//           league.maxOpportunity &&
+//           record.played + oppo + record.opportunity > league.maxOpportunity
+//         ) {
+//           throw 2; // this is somehow a bad request. client mistake!!!
+//         }
+
+//         newRecord = record;
+//         newRecord.opportunity =
+//           record.opportunity < 0
+//             ? record.opportunity + 1 + parseInt(oppo)
+//             : record.opportunity + parseInt(oppo);
+//       }
+
+//       const newRecordToSave = new Scoreboard(newRecord);
+//       const [nr, user]: any = await Promise.all([
+//         newRecordToSave.save(opts),
+//         User.findOneAndUpdate(
+//           { _id: userId },
+//           { $inc: { coupon: 0 - oppo } },
+//           { session, new: true }
+//         ),
+//       ]);
+//       await session.commitTransaction();
+//       session.endSession();
+//       return { record: nr, user };
+//     } else {
+//       throw 1;
+//     } // not enough oppo
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error; // Rethrow so calling function sees error
+//   }
+// }
+// async function exchangeRewardToMoneyHelper(userId) {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+//   try {
+//     const opts = { session };
+//     const user = await User.findById(userId);
+//     if (user && user.reward < REWARD_TRESHOLD_TO_EXCHANGE) {
+//       throw 2;
+//     } // not enough reward
+//     const toPay = new ToPay({ user: userId, amount: user.reward });
+//     await toPay.save(opts);
+//     user.reward = 0;
+//     await user.save(opts);
+
+//     await session.commitTransaction();
+//     session.endSession();
+//     return user.reward;
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error; // Rethrow so calling function sees error
+//   }
+// }
+// export async function giveRewardsHelper(collectionName) {
+//   const session = await mongoose.startSession();
+
+//   session.startTransaction();
+//   try {
+//     const opts = { session };
+//     const league = await League.findOne({ collectionName }).lean();
+//     if (!league) {
+//       throw 404;
+//     }
+//     if (league.endTime >= new Date() || league.rewarded === true) {
+//       throw 400;
+//     }
+//     const rewardUsers: any = await getRecordsHelper(league.collectionName, league.leadersNumber, 1);
+//     for (const record of rewardUsers) {
+//       await User.findOneAndUpdate(
+//         { _id: record.user },
+//         {
+//           $inc: {
+//             reward: league.reward / league.leadersNumber,
+//             totalReward: league.reward,
+//           },
+//         },
+//         opts
+//       );
+//       const wl = new WeeklyReward({
+//         user: record.user,
+//         reward: league.reward / league.leadersNumber,
+//       });
+//       await wl.save().catch(() => {}); // not so important to impact transaction
+//     }
+//     if (league.loyaltyGiven && league.loyaltyGiven !== 0) {
+//       const loyaltyUsers: any = await getRecordsHelper(
+//         league.collectionName,
+//         league.loyaltyGiven,
+//         1
+//       );
+//       loyaltyUsers.forEach((record) => {
+//         User.findOneAndUpdate(
+//           { _id: record.user },
+//           { $inc: { loyalty: league.loyaltyReward } },
+//           opts
+//         );
+//       });
+//     }
+
+//     const newLeague = await League.findOneAndUpdate(
+//       { collectionName },
+//       { rewarded: true },
+//       { session, new: true }
+//     );
+//     await session.commitTransaction();
+//     session.endSession();
+//     return newLeague;
+//   } catch (error) {
+//     await session.abortTransaction();
+//     session.endSession();
+//     throw error; // Rethrow so calling function sees error
+//   }
+// }
+
 function getRecordsHelper(league, limit, page) {
   return new Promise((resolve, reject) => {
     const Scoreboard = mongoose.model(league);
