@@ -48,7 +48,7 @@ mongoose
 async function createSuperAdmin() {
   const admin = new Admin({
     username: 'pooriya',
-    password: 'Playwin@2019',
+    password: 'playwin',
     name: 'pooriya babaei',
     email: 'pooriya.babaei.1997@gmail.com',
     phone: '09139236452',
