@@ -55,6 +55,7 @@ async function createSuperAdmin() {
     role: 'superadmin',
   });
   await admin.save();
+  console.log(admin.generateToken());
   return true;
 }
 async function f() {
