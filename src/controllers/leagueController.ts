@@ -208,7 +208,9 @@ export async function createLeague(req, res) {
     }
     info.images = images;
   }
-  const league = await new League(info).save().catch(() => {});
+  const league = await new League(info).save().catch((error) => {
+    console.log(error);
+  });
   if (!league) {
     return res.sendStatus(400);
   }
